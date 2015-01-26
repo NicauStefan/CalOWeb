@@ -11,9 +11,12 @@
 <script src="http://code.jquery.com/jquery-latest.min.js"></script>
 <script src="./dpd.js"></script>
 
-Goto <button id='save' onclick=" window.location.href='./protoP3setGoal.html';">Set goal</button><br>
+Goto <button id='save' onclick=" redirectToNewGoal();">Set goal</button><br>
 Goto <button id='save' onclick=" ;">None</button>
 
+<p id="outputResult"></p>
+<p id="initialW"></p>
+<p id="outputMessage"></p>
 <script>
 var loginID;
 
@@ -50,12 +53,23 @@ hello.on('auth.login', function(r){
 });
 </script>
 <script>
+	var redirectToNewGoal = function (){
+		window.location.href='./protoP3setGoal.html';
+	};
+</script>
+
+
+<script>
 	//Redirect if this date the current date for the goal
 	dpd.usergoal.get({"userID":loginID,"active":true}, function (result2) {
-		if(!result2 || !result2[0])
+		if(!result2)
 		{
 			console.log("ERROR with getting user from db exiting...");
 			return;
+		}
+		if(!result2[0])
+		{//no active goals
+			window.location.href='./protoP3setGoal.html';
 		}
 		currentTime = moment().format('YYYY-MM-DD');		
 		if( result2[0].dateGoal !== currentTime)
@@ -124,44 +138,139 @@ hello.on('auth.login', function(r){
 						{
 							//am adus in corp mai mult decat necesaru
 							calDelta = result1[i].amount - currentIntake;
-							gc_curent += (calDelta / 7.71617917647)/1000;//calDelta to grams, then to kg
+							gc_curent += (calDelta * 0.2958)/1000;//calDelta to grams, then to kg
 						}
 						else
 						{
 							//am adus in corp mai putin decat necesaru
 							calDelta = currentIntake - result1[i].amount;
-							gc_curent -= (calDelta / 7.71617917647)/1000;//calDelta to grams, then to kg
+							gc_curent -= (calDelta * 0.2958)/1000;//calDelta to grams, then to kg
 						}
+						console.log("For day:",result1[i].date," deduced weight:",gc_curent);
+						
 				}
 				//compar greutatea dedusa cu greutatea initiala
 				//USERGOAL
-
+				
+				var goal_type = result2[0].goalDeltaWeight;
 				var goal_weight = Math.round(result2[0].goalWeightKilograms);
 				var deduced_weight = Math.round(gc_curent);
-				
-				
-				if( goal_weight == deduced_weight )
-					console.log("YOU DID WELL !! GOAL REACHED. YOU NOW HAVE " + goal_weight);
-				else if( goal_weight >= deduced_weight ) 
-						console.log("You did not reach your goal, you wanted to reach ",goal_weight," but you have",deduced_weight);
-					else
-						console.log("You surpassed your goal, of ",goal_weight," with ",deduced_weight);
-				
-				/*
-				if( result2[0].goalDeltaWeight > 0 )
-				{//gain weight
+				console.log("	Comparing Final deduced weight in KG:",deduced_weight," with goal weight in KG:",goal_weight)
 
+				dpd.usergoal.put(result2[0].id, 
+				{
+					"active":false					
 				}
-				else 	if( result2[0].goalDeltaWeight == 0 )
-				{//gain weight
-					if( goal_weight == deduced_weight )
-						console.log("YOU DID WELL !! GOAL REACED");
-					else if( goal_weight >= deduced_weight ) 
-							console.log("You did not reach your goal, you wanted to reach ",goal_weight," but you have",deduced_weight);
-						else
-							console.log("You surpassed your goal, of ",goal_weight," with ",deduced_weight);
-				}
-				*/
+				, function(result2updated, err) {
+					if(err || !result2updated)
+					{
+						console.log("no update on DB check here...");
+						return console.log(err);
+					}
+					if(result2updated.active == false)
+						console.log("made current Goal false");
+					else
+						console.log("didn't make current Goal false");
+					
+					//~Set hasGoal for this user to false	
+					// get his ID
+					dpd.users.get({"username":loginID},function(result1){
+						if(!result1 || !result1[0])
+						{
+							console.log("Something went wrong when getting user from BD, exiting");
+							return;
+						}
+						// set hasGoal to false
+						dpd.users.put(
+							result1[0].id, 
+							{
+								"hasGoal":false	
+							},
+							function(result, err) {
+								if(err) 
+									return console.log("ERROR OCCURED:",err);
+								
+								//Give user message in regards to his goal reached or not;
+								//
+								
+								var mes = $("#outputMessage");outputResult
+								var goalResultMesage = "";
+								
+								if( goal_weight == deduced_weight )
+								{
+									goalResultMesage = "YOU NOW HAVE " + goal_weight;
+									$("#outputResult").text("YOU DID WELL !! GOAL REACHED");
+								} 
+								else if( goal_type > 0 )
+								{// gain weight
+									
+									if (goal_weight > deduced_weight)
+									{	
+										var diff = goal_weight - deduced_weight;
+										goalResultMesage = "Your current weight should be :"+deduced_weight+"kg, you needed to gain "+diff+"kg more";
+										$("#outputResult").text("You did not gain enough");
+									}
+									else
+									{
+										var diff = deduced_weight - goal_weight;
+										goalResultMesage = "Your current weight should be :"+deduced_weight+"kg, you gained "+diff+"kg too much";
+										$("#outputResult").text("You gained too much");
+									}
+								}
+								else if (goal_type == 0)	// maintain weight
+								{
+									if (goal_weight > deduced_weight)
+									{	
+										var diff = goal_weight - deduced_weight;
+										goalResultMesage = "Your current weight should be:"+deduced_weight+"kg, your lost " + diff + "kg weight";
+										$("#outputResult").text("You did not maintain your weight");
+									}
+									else
+									{
+										var diff = deduced_weight - goal_weight;
+										goalResultMesage = "Your current weight should be :"+deduced_weight+"kg you gained "+diff+"kg too much";
+										$("#outputResult").text("You did not maintain your weight");
+									}
+								}
+								else	//lose weight
+								{		// 35 32
+									if (goal_weight > deduced_weight)
+									{	
+										var diff = goal_weight - deduced_weight;
+										goalResultMesage = "Your current weight should be:"+deduced_weight+"kg, your lost " + diff + "kg too much";
+										$("#outputResult").text("You lost too much weight");
+									}
+									else
+									{
+										var diff = deduced_weight - goal_weight;
+										goalResultMesage = "Your current weight should be :"+deduced_weight+"kg you needed to loose "+diff+"kg more";
+										$("#outputResult").text("You did not lose enough weight");
+									}								
+								
+								}
+								$("#initialW").text("Your weight when you set this goal:"+gc_initial+"kg");
+								console.log(goalResultMesage);
+								mes.text(goalResultMesage);
+								
+								/*
+								if( goal_weight == deduced_weight )
+									console.log("YOU DID WELL !! GOAL REACHED. YOU NOW HAVE " + goal_weight);
+								else if( goal_weight >= deduced_weight ) 
+										console.log("You did not reach your goal, you wanted to reach ",goal_weight," but you have",deduced_weight);
+									else
+										console.log("You surpassed your goal, of ",goal_weight," with ",deduced_weight);
+								*/	
+							});
+						
+					});
+				});
+				
+				
+
+				
+				
+				
+	
 			});
 			
 		});

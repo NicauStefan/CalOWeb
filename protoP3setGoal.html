@@ -64,9 +64,12 @@ var redirectNext = function(idd)
 	console.log("putting :",idd);
 	dpd.users.put({"id":idd ,"hasGoal":true} ,function (result1) {
 				if(!result1)
+				{
 					console.log("~~~~ERROR HERE~~~~:",result1);
-				else
-					window.location.href='./protoP6goalReached.html';
+					return;
+				}
+
+				window.location.href='./protoP6goalReached.html';
 		});	
 	
 		

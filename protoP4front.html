@@ -92,7 +92,7 @@ hello.on('auth.login', function(r){
 					window.location.href='./protoP3setGoal.html';
 				
 				// check if GOALdate has been reached 
-				dpd.usergoal.get({"userID":loginID}, function (result) {
+				dpd.usergoal.get({"userID":loginID,"active":true}, function (result) {
 					console.log("Querrying USERGOAL for reachedGoal:",result[0].reachedGoal);
 					var currentDate = moment().format('YYYY-MM-DD');
 					if(result[0].dateGoal === currentDate)
