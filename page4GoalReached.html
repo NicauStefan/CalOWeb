@@ -199,9 +199,16 @@ hello.on('auth.login', function(r){
 								var goalResultMesage = "";
 								
 								if( goal_weight == deduced_weight )
-								{
+								{//succeded
 									goalResultMesage = "YOU NOW HAVE " + goal_weight;
-									$("#outputResult").text("YOU DID WELL !! GOAL REACHED");
+									var word;
+									if( goal_type > 0 )
+										word = "gain";
+									else if ( goal_type == 0 )
+										word = "maintain";
+									else 
+										word = "lose";
+									$("#outputResult").text("YOU DID WELL !!You have "+word+" desired weight GOAL REACHED");
 								} 
 								else if( goal_type > 0 )
 								{// gain weight

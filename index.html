@@ -39,7 +39,7 @@ var wl = hello( "google" ).getAuthResponse();
 var redirect = function loginPageUrl(network){
 					hello( network ).login({
 						display:'page',
-						page_uri:'./portoP1logDB.html'
+						page_uri:'./page1login.html'
 						
 					});
 				};
@@ -64,19 +64,22 @@ hello.on('auth.login', function(r){
 		var userID = p.id;
 		var query = {"username":userID};
 
+		/*
 			dpd.users.get(query, function (result) {
 				console.log(result,"<-is first login");
 				console.log("him goal",result);
+
 				
 				if(result && result[0] && result[0].hasGoal == true)
 				 redirect = function loginPageUrl(network){
 						hello( network ).login({
 							display:'page',
-							page_uri:'./protoP4front.html'
+							page_uri:'./page4GoalReached.html'
 						});
 					};
 				 
 				});
+		*/
 	});
 });
 
@@ -100,7 +103,7 @@ hello.init(
 		oauth_proxy : 'https://auth-server.herokuapp.com/proxy',
 		scope: 'email',
 		//redirect_uri:'redirect.html'
-		redirect_uri:'portoP1logDB.html' //'./redirect.html'
+		redirect_uri:'page1login.html' //'./redirect.html'
 	}
 );
 </script>
