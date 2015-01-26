@@ -14,16 +14,17 @@
 
 <button id='google' onclick=" ;">google2</button>&nbsp;
 <button id='logout' onclick="logout('google');">Logout</button><br>
+
 Go to <button id='info' onclick=" goToInfo();">hbe info</button><br>
 Go to <button id='goal' onclick=" goToGoal();">goal</button><br>
-Go to <button id='status' onclick="goToStatus();">status</button><br>
 Go to <button id='consumables' onclick="goToConsumables();">add consumables</button><br>
+Go to <button id='sugestion' onclick="goToSugestions();">sugestions</button><br>
 Go to <button id='charts' onclick="goToCharts();">charts</button><br>
 <br>
 
 <p id="dateToday"></p>
 <p id="weightToday"></p>
-<p id="dateToday"></p>
+
 
 
 
@@ -184,37 +185,87 @@ hello.on('auth.login', function(r){
 				}
 				//compar greutatea dedusa cu greutatea initiala
 				//USERGOAL
-				// today -> deduced weight -> you have this much more to gain/loose/maitain for the next X days
-				// on the right path?	compare initial weight to the deduced weight
+				// today -> deduced weight || goal date goal weight
+				//-> you have this much more to gain/loose/maitain for the next X days
+				
+				//ADVICE: on the right path?	compare initial weight to the deduced weight
 				var goal_type = result2[0].goalDeltaWeight;
 				var goal_weight = Math.round(result2[0].goalWeightKilograms);
 				var deduced_weight = Math.round(gc_curent);
 				console.log("	Comparing Final deduced weight in KG:",deduced_weight," with goal weight in KG:",goal_weight)
 				
 				$("#dateToday").text("Today is "+currentTime);
+				var message = "Your current weight should be :"+deduced_weight;
+				var dif;
 				
 				
+				var lastInputDay = result1[result1.length - 1].date; 
+				var dateLast = moment(lastInputDay);
+				var dateGoal = moment(result2[0].dateGoal);
+				var syntaxForDay;
+				if((dateGoal.diff(dateLast,'days')) == 1)
+				{
+					console.log("Day left till goal: ",dateGoal.diff(dateLast,'day'));
+					syntaxForDay = " day";
+				}
+				else
+				{
+					console.log("Days left till goal: ",dateGoal.diff(dateLast,'days'));
+					syntaxForDay = " days";
+				}	
+				var daysLeft = dateGoal.diff(dateLast,'days');
+				
+
+				if( deduced_weight > goal_weight )
+				{//goal surpassed
+					dif = deduced_weight - goal_weight;
+					message += " you need to loose "+dif+" in the next "+daysLeft + syntaxForDay;
+				}
+				else if( deduced_weight == goal_weight )
+				{//goal on scheduel
+					message += " you currently have the desired weight for the next "+daysLeft + syntaxForDay;
+				}
+				else //goal not reached; eat more
+				{
+					dif = goal_weight - deduced_weight;
+					message += " you need to gain "+dif+"kg more in the next "+daysLeft + syntaxForDay;
+				}	
+				
+				$("#weightToday").text(message);
+				
+				/*
 				if( goal_type > 0 )
 				{// gain
 					
 					if( deduced_weight > goal_weight )
-					{//eats too much
-						
+					{//goal surpassed
+						dif = deduced_weight - goal_weight;
+						message += " you need to loose "+dif+" in the next "+daysLeft+" days";
 					}
-					else if()
-					else
+					else if( deduced_weight == goal_weight )
+					{//goal on scheduel
+					
+						message += " you should maitain this diet for the next "+daysLeft+" days";
+					}
+					else //goal not reached; eat more
+					{
+						dif = goal_weight -deduced_weight;
+						message += " you need to gain "+dif+"kg more in the next "+daysLeft+" days";
+					}
 				}
 				else if(goal_type == 0)
-				{// maintain
-					
+				{// maintian
+
+			
+				
 				}
 				else 
 				{
-					
+					;
 				}
 				
-				$("#weightToday").text("Your current weight should be :"+deduced_weight+"  ");
 				
+				*/
 				});
 			
 			});
@@ -233,26 +284,6 @@ function logout(network){
 	
 </script>
 
-<script>
-	
-	
-	dpd.objcal.get(function (result, err) {
-		if(err) return console.log(err);
-		console.log(result);
-		
-		var key;
-		var value;		
-		var food = $("#dateToday");
-		
-		for(var i = 0 ; i < result.length ;i++)
-		{
-			key = result[i].id;
-			value = result[i].name;
-			food.append($("<option></option>").attr("value",key).text(value));
-		}
-	});
-</script>
-
 
 <script>
 
@@ -269,8 +300,8 @@ function logout(network){
 		window.location.href='./page3SetGoal.html';
 	};
 
-	var goToStatus = function(){
-		window.location.href='./page6status.html';
+	var goToSugestions = function(){
+		window.location.href='./page7sugestions.html';
 	};
 
 	var goToConsumables = function(){

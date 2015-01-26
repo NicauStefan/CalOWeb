@@ -11,20 +11,17 @@
 <script src="http://code.jquery.com/jquery-latest.min.js"></script>
 <script src="./dpd.js"></script>
 
-<button id='google' onclick=" ;">google2</button>
-<button id='goal' onclick=" ;">goal</button>
-<button id='hist' onclick=" ;">histogram</button>
-<button id='advice' onclick=" ;">advice</button>
+<button id='google' onclick=" ;">google2</button>&nbsp;
+<button id='logout' onclick="logout('google');">Logout</button><br>
 
-<button id='logout' onclick="logout('google');">Logout</button>
-
-<input type="number" name="milig" min="1" max="3000" value="1" id="quatiy">
-<label for="Range">Food:</label>
-	<select name="Rng" id="Range">
-	</select>
+Go to <button id='info' onclick=" goToInfo();">hbe info</button><br>
+Go to <button id='goal' onclick=" goToGoal();">goal</button><br>
+Go to <button id='status' onclick="goToStatus();">status</button><br>
+Go to <button id='consumables' onclick="goToConsumables();">add consumables</button><br>
+Go to <button id='charts' onclick="goToCharts();">charts</button><br>
 <br>
-<button id='save' onclick=" saveDayCal();">save</button>
 
+<p id="message"></p>
 
 <script>
 var loginID;
@@ -97,6 +94,201 @@ hello.on('auth.login', function(r){
 </script>
 
 <script>
+	dpd.usergoal.get({"userID":loginID,"active":true}, function (result2) {
+		if(!result2)
+		{
+			console.log("ERROR with getting user from db exiting...");
+			return;
+		}
+		if(!result2[0])
+		{//no active goals
+			console.log("no active goal found");
+			window.location.href='./protoP3setGoal.html';
+		}
+		currentTime = moment().format('YYYY-MM-DD');
+		
+		dpd.userhbe.get({"userID":loginID}, function (result) {
+			console.log("Querrying USERHBE");
+			if(!result || !result[0])
+			{
+				//__Failed Querrying userHBE
+				console.log("cannot conect to database/user dosen't exist");
+				return;
+				//window.location.href='./index.html';
+			}
+			console.log("~~~GET~~~For userHBE~:",result);
+			dpd.userhistory.get({"userID":loginID},function(result1){
+				if(!result1)
+					console.log("ERRROR-CANNOT ACCESS DB");
+
+				//exercises 			
+				
+				var weightBMR;
+				var BMR_const;
+				var BMR;
+				
+				var gc_initial = result[0].weight;// in KG
+				var gc_curent = gc_initial;
+				if( result[0].gender == false )
+				{//female
+					BMR_const = 447.593 + (3.098 * result[0].height) - (4.330 * result[0].age);
+					weightBMR = 9.247;
+				}
+				else			
+				{//male
+					BMR_const = 88.362 + (4.799 * result[0].height) - (5.677 * result[0].age);
+					weightBMR = 13.397;
+				}
+				
+				var currentIntake;
+				var	calDelta;
+				var exercises = result[0].exercises;
+				// sorted by date?
+				for(var i = 0 ; i < result1.length; i++)
+				{
+					BMR = BMR_const + gc_curent*weightBMR;
+					if( exercises === "1" )
+						currentIntake = BMR * 1.2;
+					else if( exercises ==="2" )
+						currentIntake = BMR * 1.375;
+					else if( exercises ==="3" )
+						currentIntake = BMR * 1.55;
+					else if( exercises ==="4" )
+						currentIntake = BMR * 1.725;
+					else if( exercises ==="5" )
+						currentIntake = BMR * 1.9;
+					else
+						console.log("ERROR bad variable exerecises");
+						
+					if(currentIntake == result1[i].amount)
+						gc_curent = gc_curent;
+					else if (currentIntake < result1[i].amount) 
+						{
+							//am adus in corp mai mult decat necesaru
+							calDelta = result1[i].amount - currentIntake;
+							gc_curent += (calDelta * 0.2958)/1000;//calDelta to grams, then to kg
+						}
+						else
+						{
+							//am adus in corp mai putin decat necesaru
+							calDelta = currentIntake - result1[i].amount;
+							gc_curent -= (calDelta * 0.2958)/1000;//calDelta to grams, then to kg
+						}
+						console.log("For day:",result1[i].date," deduced weight:",gc_curent);
+						
+				}
+				//compar greutatea dedusa cu greutatea initiala
+				//USERGOAL
+				// today -> deduced weight || goal date goal weight
+				//-> you have this much more to gain/loose/maitain for the next X days
+				
+				//ADVICE: on the right path?	compare initial weight to the deduced weight
+				var goal_type = result2[0].goalDeltaWeight;
+				var goal_weight = Math.round(result2[0].goalWeightKilograms);
+				var deduced_weight = Math.round(gc_curent);
+				console.log("	Comparing Final deduced weight in KG:",deduced_weight," with goal weight in KG:",goal_weight)
+				
+				var message;
+				var dif;
+				
+				
+				var lastInputDay = result1[result1.length - 1].date; 
+				var dateLast = moment(lastInputDay);
+				var dateGoal = moment(result2[0].dateGoal);
+				var syntaxForDay;
+				var daysLeft = dateGoal.diff(dateLast,'days');
+				if(daysLeft == 1)
+				{
+					console.log("Day left till goal: ",dateGoal.diff(dateLast,'day'));
+					syntaxForDay = " day";
+				}
+				else
+				{
+					console.log("Days left till goal: ",dateGoal.diff(dateLast,'days'));
+					syntaxForDay = " days";
+				}	
+				var daysLeft = dateGoal.diff(dateLast,'days');
+				
+				/*
+				if( deduced_weight > goal_weight )
+				{//goal surpassed
+					dif = deduced_weight - goal_weight;
+					message += " you need to loose "+dif+" in the next "+daysLeft + syntaxForDay;
+				}
+				else if( deduced_weight == goal_weight )
+				{//goal on scheduel
+					message += " you should maitain this diet for the next "+daysLeft + syntaxForDay;
+				}
+				else //goal not reached; eat more
+				{
+					dif = goal_weight - deduced_weight;
+					message += " you need to gain "+dif+"kg more in the next "+daysLeft + syntaxForDay;
+				}	
+				*/
+				
+				
+				
+				if( goal_type > 0 )
+				{// gain
+					
+					if( deduced_weight > goal_weight )
+					{//goal surpassed
+						message = "You consumed more than your goal,you should consume items with a smaller calori value";
+					}
+					else if( deduced_weight == goal_weight )
+					{//goal on scheduel
+					
+						message = "You have your desired weight, keep up your diet!";
+					}
+					else //goal not reached; eat more
+					{
+						message = "You need to consume more food with a greater calori intake";
+					}
+				}
+				else if(goal_type == 0)
+				{// maintian
+
+					if( deduced_weight > goal_weight )
+					{//goal surpassed
+						message = "You should stop consuming so much.In order to keep your initial diet try eating items with a smaller calori value";
+					}
+					else if( deduced_weight == goal_weight )
+					{//goal on scheduel
+					
+						message = "You have reached your desired weight, you are on the right track, keep up your current diet!";
+					}
+					else //goal not reached; eat more
+					{
+						message = "You need to consume more food with a greater calori intake to reach again your initial weight";
+					}			
+				
+				}
+				else 
+				{//loose weight
+					if( deduced_weight > goal_weight )
+					{//goal surpassed
+						message = "You have not lost enough weight yet, try eatubg items with a lesser value";
+					}
+					else if( deduced_weight == goal_weight )
+					{//goal on scheduel
+					
+						message = "You have reached your desired weight, you are on the right track, keep up your current diet!";
+					}
+					else //goal not reached; eat more
+					{
+						message = "You need to consume more food with a greater calori intake to reach again your initial weight";
+					}
+				}
+				
+				if(daysLeft < 7)
+					message += ",you are close to your goal don't give up!Only "+daysLeft+" days left.";
+								
+				$("#message").text(message);
+				
+				
+				});
+			});
+	});
 </script>
 
 <script>
@@ -110,75 +302,30 @@ function logout(network){
 	
 </script>
 
-<script>
-	
-	
-	dpd.objcal.get(function (result, err) {
-		if(err) return console.log(err);
-		console.log(result);
-		
-		var key;
-		var value;		
-		var food = $("#Range");
-		
-		for(var i = 0 ; i < result.length ;i++)
-		{
-			key = result[i].id;
-			value = result[i].name;
-			food.append($("<option></option>").attr("value",key).text(value));
-		}
-	});
-</script>
-<script>
-	var saveDayCal = function(){
-		
-		var currentTime = moment().format('YYYY-MM-DD');
-		var quatiy = $("#quatiy").val();
-		var food = $("#Range").val();
-		
-		dpd.usergoal.get({"userID":loginID}, function (result) {
-			console.log("Querrying USERGOAL",result[0]);
 
-			dpd.userhistory.get({"userID":loginID,"day":currentTime},function(result){
-				if(!result)
-					console.log("ERRROR-CANNOT ACCESS DB");
-				if(!result[0])
-				{
-					dpd.userhistory.post(
-					{
-						"userID":loginID,
-						"day":currentTime,
-						"amount":quatiy
-					}
-					, function(result, err) {
-						  if(err) return console.log(err);
-						  console.log("~~~POST~~~For userHistory~:",result, result.id);
-						  
-					});	
-				}
-				else
-				{
-					var amountTotal = result[0].amount + parseInt(quatiy);
-					dpd.userhistory.put(result[0].id,
-					{
-						"userID":loginID,
-						"day":currentTime,
-						"amount":amountTotal
-					}
-					, function(result, err) {
-						  if(err) return console.log(err);
-						  console.log("~~~POST~~~For userHistory~:",result, result.id);
-						  
-					});					
-				}
-				
-			});
-			
-			
-		});	
-		
-		console.log("going with ",quatiy," and ",food);
+
+<script>
+//redirects
+	var goToInfo = function(){
+		window.location.href='./page2UserInfo.html';
 	};
+
+	var goToGoal = function(){
+		window.location.href='./page3SetGoal.html';
+	};
+
+	var goToStatus = function(){
+		window.location.href='./page6status.html';
+	};
+
+	var goToConsumables = function(){
+		window.location.href='./page5AddFood.html';
+	};
+
+	var goToCharts = function(){
+		window.location.href='./page8charts.html';
+	};	
+	
 </script>
 
 <script>
