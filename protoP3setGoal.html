@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+
+<body>
+<script src="lib/hello.js"></script>
+<script src="lib/hello.then.js"></script>
+<script src="lib/modules/windows.js"></script>
+<script src="lib/modules/facebook.js"></script>
+<script src="lib/modules/google.js"></script>
+<script src="lib/moment.js"></script>
+
+<!--
+<script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+<script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+-->
+<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script src="./dpd.js"></script>
+
+<button id='google' onclick=" ;">google2</button>
+<button id='logout' onclick="logout('google');">Logout</button>
+
+<form>
+	<fieldset>
+		<legend>Appearance</legend>
+		<p>
+			<label for="Range">Select Age Range:</label>
+			<select name="Rng" id="Range">
+				<option value="a1">10</option>
+				<option value="a2">20</option>
+				<option value="a3">30</option>
+				<option value="a4">40</option>
+				<option value="a5">50</option>
+			</select>
+		</p>
+
+		<p>
+			<label for="slider">Select Age:</label> <input name="slider" type="range" min="-10" max="10" id="slider" value="0" />
+			<!--<span id="output"></span>-->
+		</p>
+		<input type="number" name="kg_w" min="-50" max="50" value="0" id="inpT">
+		<p>Enter the date you want to reach this goal:</p>
+		<p>Format is [Year][Month][Day]</p><br>
+		<input id="date" name="date" />
+		<input type="button" onclick="insertDB();" value="Submit">
+	</fieldset>
+</form>
+
+<script>
+var currentTime;
+var goalTime;
+var minIn = -10,maxIn = 10;
+var globID;
+
+var redirectNext = function(idd)
+{
+	//__Here verify if he has goal; if he has redirect to main page
+	//return;
+	//__Currently Chainging flag from database of hasINFO to true;
+	//
+	//dpd.users.put({"id":me.id ,"hasGoal":true} ,function (result1) {
+	//		if(!result1)
+	//			console.log("~~~~ERROR HERE~~~~:",result1);
+	//});
+	
+	console.log("putting :",idd);
+	dpd.users.put({"id":idd ,"hasGoal":true} ,function (result1) {
+				if(!result1)
+					console.log("~~~~ERROR HERE~~~~:",result1);
+				else
+					window.location.href='./protoP6goalReached.html';
+		});	
+	
+		
+}
+
+var insertDB = function(){
+	
+	//__Validation
+	var inputT = $("#inpT");
+	
+	if( inputT.val() < minIn || inputT.val() > maxIn)
+	{
+		alert("Form field error");
+		return; 
+ 	}
+	
+	var dateIn = $("#date");
+	
+	//console.log("date formated",dateIn.val()," and ",moment(dateIn.val(),'DD-MM-YYYY'));
+		//month must have 2 digits
+	if (!moment(dateIn.val(),'YYYY-MM-DD',true).isValid() )	
+	{
+		console.log('Invalid Date');
+	} 
+	else 
+	{
+		console.log('Valid Date');
+	}
+	console.log("testing1:",goalTime," with ", currentTime, " diff ");
+	
+	//__Cannot set as goal a date earlier than today 
+	var currentTimeWithToday = (moment().subtract(1,'d')).format('YYYY-MM-DD');
+	if(!moment(dateIn.val(),'YYYY-MM-DD').isAfter(currentTimeWithToday,'YYYY-MM-DD'))
+	{
+		console.log("BAD time");
+		return; 
+ 	}
+	
+	console.log("tine in sec",goalTime, moment(goalTime));
+	//__DATABASE Querring
+	
+
+	dpd.users.get({"username":globID},function(result1){
+		if(!result1)
+		{
+			//__Failed Querrying users
+			console.log("cannot conect to database for user");
+			//window.location.href='./index.html';
+			return;
+		}
+			
+		//__GET USERGoal data; see if this user has GoalInfo
+		var query = {"userID":globID};
+		dpd.usergoal.get({"userID":globID,"active":true}, function (result) {
+			console.log("Querrying USERGOAL");
+			if(!result)
+			{
+				//__Failed Querrying userGoal
+				console.log("cannot conect to database");
+				return;
+				//window.location.href='./index.html';
+			}
+			
+			console.log("~~~GET~~~For userGoal~:",result);
+			
+			dpd.userhbe.get(query,function (result2) {
+				
+				if(!result2)
+				{
+					console.log("cannot connect to db");
+					return;
+				}
+				if(!result2[0])
+				{
+					console.log("user dose not exist in database exiting...");
+					return;
+				}
+				
+				var kg = result2[0].weight + parseInt(inputT.val());
+				//console.log("~~~~~~~~~~~~~~KG:",kg);
+				if( result.length == 0 )
+				{
+					//__User dosen't have USERGOAL; add it by using POST
+					
+					dpd.usergoal.post(
+					{
+						"userID":result1[0].username,
+						"dateSetGoal":currentTime,
+						"dateGoal":goalTime,
+						"goalDeltaWeight":inputT.val(),
+						"goalWeightKilograms":kg,
+						"active":true
+					}
+					, function(result, err) {
+						  if(err) return console.log(err);
+						  console.log("~~~POST~~~For userGoal~:",result, result.id);
+						  redirectNext(result1[0].id);
+					});				
+				}
+				else
+				{
+					
+					//__User has USERGOAL; ~~~~update existing USERGOAL by using PUT~~~`
+					// get returned a ative goal;
+					//make it unactive 
+					// and make a new goal for same user
+					
+					dpd.usergoal.put(result[0].id, 
+					{
+						"active":false					
+					}
+					, function(result, err) {
+						  if(err) 
+							return console.log(err);
+						  console.log("~~~PUT~~~For userGoal~:", result);
+						  //return;
+							dpd.usergoal.post(
+							{
+								"userID":result1[0].username,
+								"dateSetGoal":currentTime,
+								"dateGoal":goalTime,
+								"goalDeltaWeight":inputT.val(),
+								"goalWeightKilograms":kg,
+								"active":true
+							}
+							, function(result, err) {
+								  if(err) return console.log(err);
+								  console.log("~~~POST~~~For userGoal~:",result, result.id);
+								  redirectNext(result1[0].id);
+							});		
+					});
+					
+				}			
+			
+			});
+			
+
+			
+		});
+	
+	});
+	
+};
+
+</script>
+
+
+<script>
+	$(function(){
+
+		goalTime = (moment().add(1,'d')).format('YYYY-MM-DD');// goal starts 1 day after today
+		currentTime = moment().format('YYYY-MM-DD');
+		var dateIn = $("#date");
+		console.log("date:",goalTime);
+		dateIn.val(goalTime);
+		
+		dateIn.on("change",function(){
+			goalTime = dateIn.val();
+			
+		});
+		
+		//dateIn.attr({min:currentTime});
+		//Range
+		var slider = $("#slider"), val = slider.val();	//, output = $("#output");
+		var inputT = $("#inpT");
+	
+		//Change range values
+		var minMax = {
+			a1: [-10, 10],
+			a2: [-20, 20],
+			a3: [-30, 30],
+			a4: [-40, 40],
+			a5: [-50, 50]
+		};
+
+		var check = minMax[$("#Range").val()];
+
+		minIn = check[0];
+		maxIn = check[1];		
+	
+		slider.on("change",function(){
+			inputT.val(slider.val());
+		});
+
+		$("#Range").on("change", function(){
+			console.log("sup:",$(this).val());
+			var ages = minMax[$(this).val()];
+			if(ages) {
+				slider.attr({
+					min: ages[0],
+					max: ages[1]
+				});
+
+				inputT.attr({
+					min: ages[0],
+					max: ages[1]
+				});
+				minIn = ages[0];
+				maxIn = ages[1];
+				console.log("hi,",slider.val()," with ",inputT.val());
+				inputT.val(slider.val());
+			}
+		});
+	});
+</script>
+
+
+
+<script>
+
+var online = function(session){
+	var current_time = (new Date()).getTime() / 1000;
+	return session && session.access_token && session.expires > current_time;
+};
+
+var fb = hello( "facebook" ).getAuthResponse();
+var wl = hello( "google" ).getAuthResponse();
+
+//alert(( online(fb) ? "Signed":"Not signed") + " into FaceBook, " + ( online(wl) ? "Signed":"Not signed")+" into Google");
+if(!(online(fb) || 
+	online(wl)))
+{//  http://localhost:2403/protoP1.html
+	alert("not logged into any account please login"+online(fb) + " and "+ online(wl));
+	window.location.href='./index.html';
+
+}
+//alert("good");
+//window.location.href='./protoPage3setup.html';
+</script>
+
+
+
+
+<script>
+hello.on('auth.login', function(r){
+	
+	// call user information, for the given network
+
+	
+	hello( r.network ).api( '/me' ).then( function(p){
+		//console.log("function input is:"+p.thumbnail);
+		console.log(p);
+		console.log(p.id);
+		globID = p.id;
+		
+		var label = document.getElementById(r.network);
+		label.innerHTML = "<img src='"+ p.thumbnail + "' width=24/>Connected to "+ r.network+" as " + p.name;
+	});
+	
+	
+});
+</script>
+
+<script>
+	
+function logout(network){
+	hello( network ).logout(function(e){
+		console.log("logged out",e);
+		window.location.href='./index.html';
+	});
+}	
+	
+</script>
+
+
+
+
+
+<script>
+
+hello.init(
+//	CLIENT_IDS,
+	{google   : '211022602923-pq5hf5f11nsgko5rbr0upna9havrko98.apps.googleusercontent.com'}
+	,
+	{
+		scope: 'email',
+		//redirect_uri:'redirect.html'
+		redirect_uri:'http://localhost:2403/hello.js-master/redirect.html'
+	}
+);
+</script>
+
+</body>

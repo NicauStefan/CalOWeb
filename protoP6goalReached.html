@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+
+<body>
+<script src="lib/hello.js"></script>
+<script src="lib/hello.then.js"></script>
+<script src="lib/modules/windows.js"></script>
+<script src="lib/modules/facebook.js"></script>
+<script src="lib/modules/google.js"></script>
+<script src="lib/moment.js"></script>
+
+<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script src="./dpd.js"></script>
+
+Goto <button id='save' onclick=" window.location.href='./protoP3setGoal.html';">Set goal</button><br>
+Goto <button id='save' onclick=" ;">None</button>
+
+<script>
+var loginID;
+
+var online = function(session){
+	var current_time = (new Date()).getTime() / 1000;
+	return session && session.access_token && session.expires > current_time;
+};
+
+var fb = hello( "facebook" ).getAuthResponse();
+var wl = hello( "google" ).getAuthResponse();
+
+if(!(online(fb) || 
+	online(wl)))
+{
+	alert("not logged into any account please login"+online(fb) + " and "+ online(wl));
+	window.location.href='./index.html';
+
+}
+
+
+</script>
+
+
+<script>
+hello.on('auth.login', function(r){
+	
+	// call user information, for the given network
+
+	hello( r.network ).api( '/me' ).then( function(p){
+		loginID = p.id;
+		console.log("got loginID");
+		console.log("");
+	});
+});
+</script>
+<script>
+	//Redirect if this date the current date for the goal
+	dpd.usergoal.get({"userID":loginID,"active":true}, function (result2) {
+		if(!result2 || !result2[0])
+		{
+			console.log("ERROR with getting user from db exiting...");
+			return;
+		}
+		currentTime = moment().format('YYYY-MM-DD');		
+		if( result2[0].dateGoal !== currentTime)
+		{
+			window.location.href='./protoP4front.html';
+		}
+		
+		// Has reached the goal date; see if weight matches expectations 
+	
+		dpd.userhbe.get({"userID":loginID}, function (result) {
+			console.log("Querrying USERHBE");
+			if(!result || !result[0])
+			{
+				//__Failed Querrying userHBE
+				console.log("cannot conect to database/user dosen't exist");
+				return;
+				//window.location.href='./index.html';
+			}
+			console.log("~~~GET~~~For userHBE~:",result);
+			dpd.userhistory.get({"userID":loginID},function(result1){
+				if(!result1)
+					console.log("ERRROR-CANNOT ACCESS DB");
+
+				//exercises 			
+				
+				var weightBMR;
+				var BMR_const;
+				var BMR;
+				
+				var gc_initial = result[0].weight;// in KG
+				var gc_curent = gc_initial;
+				if( result[0].gender == false )
+				{//female
+					BMR_const = 447.593 + (3.098 * result[0].height) - (4.330 * result[0].age);
+					weightBMR = 9.247;
+				}
+				else			
+				{//male
+					BMR_const = 88.362 + (4.799 * result[0].height) - (5.677 * result[0].age);
+					weightBMR = 13.397;
+				}
+				
+				var currentIntake;
+				var	calDelta;
+				var exercises = result[0].exercises;
+				// sorted by date?
+				for(var i = 0 ; i < result1.length; i++)
+				{
+					BMR = BMR_const + gc_curent*weightBMR;
+					if( exercises === "1" )
+						currentIntake = BMR * 1.2;
+					else if( exercises ==="2" )
+						currentIntake = BMR * 1.375;
+					else if( exercises ==="3" )
+						currentIntake = BMR * 1.55;
+					else if( exercises ==="4" )
+						currentIntake = BMR * 1.725;
+					else if( exercises ==="5" )
+						currentIntake = BMR * 1.9;
+					else
+						console.log("ERROR bad variable exerecises");
+						
+					if(currentIntake == result1[i].amount)
+						gc_curent = gc_curent;
+					else if (currentIntake < result1[i].amount) 
+						{
+							//am adus in corp mai mult decat necesaru
+							calDelta = result1[i].amount - currentIntake;
+							gc_curent += (calDelta / 7.71617917647)/1000;//calDelta to grams, then to kg
+						}
+						else
+						{
+							//am adus in corp mai putin decat necesaru
+							calDelta = currentIntake - result1[i].amount;
+							gc_curent -= (calDelta / 7.71617917647)/1000;//calDelta to grams, then to kg
+						}
+				}
+				//compar greutatea dedusa cu greutatea initiala
+				//USERGOAL
+
+				var goal_weight = Math.round(result2[0].goalWeightKilograms);
+				var deduced_weight = Math.round(gc_curent);
+				
+				
+				if( goal_weight == deduced_weight )
+					console.log("YOU DID WELL !! GOAL REACHED. YOU NOW HAVE " + goal_weight);
+				else if( goal_weight >= deduced_weight ) 
+						console.log("You did not reach your goal, you wanted to reach ",goal_weight," but you have",deduced_weight);
+					else
+						console.log("You surpassed your goal, of ",goal_weight," with ",deduced_weight);
+				
+				/*
+				if( result2[0].goalDeltaWeight > 0 )
+				{//gain weight
+
+				}
+				else 	if( result2[0].goalDeltaWeight == 0 )
+				{//gain weight
+					if( goal_weight == deduced_weight )
+						console.log("YOU DID WELL !! GOAL REACED");
+					else if( goal_weight >= deduced_weight ) 
+							console.log("You did not reach your goal, you wanted to reach ",goal_weight," but you have",deduced_weight);
+						else
+							console.log("You surpassed your goal, of ",goal_weight," with ",deduced_weight);
+				}
+				*/
+			});
+			
+		});
+	});	
+</script>
+
+
+
+<script>
+
+hello.init(
+//	CLIENT_IDS,
+	{google   : '211022602923-pq5hf5f11nsgko5rbr0upna9havrko98.apps.googleusercontent.com'}
+	,
+	{
+		scope: 'email',
+		//redirect_uri:'redirect.html'
+		redirect_uri:'http://localhost:2403/hello.js-master/redirect.html'
+	}
+);
+</script>
+</body>

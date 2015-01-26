@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+	<link href="http://adodson.com/hello.js/assets/redirect.css" rel="stylesheet" />
+</head>
+<body>
+
+<div class="loading"><span>&bull;</span><span>&bull;</span><span>&bull;</span></div>
+<div id='wrapper' style='display:none'>
+	<p>Hi proto1logDB</p>
+</div>
+
+
+</body>
+
+<script src="lib/hello.js"></script>
+<script src="lib/hello.then.js"></script>
+<script src="lib/modules/windows.js"></script>
+<script src="lib/modules/facebook.js"></script>
+<script src="lib/modules/google.js"></script>
+
+<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script src="./dpd.js"></script>
+
+
+<script>
+
+var online = function(session){
+	var current_time = (new Date()).getTime() / 1000;
+	return session && session.access_token && session.expires > current_time;
+};
+
+var fb = hello( "facebook" ).getAuthResponse();
+var wl = hello( "google" ).getAuthResponse();
+
+//alert(( online(fb) ? "Signed":"Not signed") + " into FaceBook, " + ( online(wl) ? "Signed":"Not signed")+" into Google");
+if(!(online(fb) || 
+	online(wl)))
+{//  http://localhost:2403/protoP1.html
+	alert("not logged into any account please login"+online(fb) + " and "+ online(wl));
+	window.location.href='./index.html';
+
+}
+//alert("good");
+//window.location.href='./protoPage3setup.html';
+</script>
+
+
+<script>
+
+
+hello.on('auth.login', function(r){
+	
+	// call user information, for the given network
+	console.log("YOoooooo",r);
+	console.log("YO",r.network);
+	hello( r.network ).api( '/me' ).then( function(p){
+		//console.log("function input is:"+p.thumbnail);
+		
+		console.log("going for all user info:",p);
+		var userID = p.id;//"100704041958754993160";//
+		console.log("uid:",userID);
+		//not logged in
+
+			
+			var query = {"username":userID};
+
+			dpd.users.get(query, function (result) {
+			  console.log(result,"<-is first login");
+			  
+		
+	
+			  //console.log("result & [0]",result,result[0]);
+				if(!result)
+				{
+					console.log("failed to request data from server exiting...");
+					return;
+				}
+				
+				var loginId = '';
+				var tokenRsp = r.authResponse.access_token; 
+
+				var loginAndUpdateToken = function(uidd,pass,tokenURL){
+				
+					//FIRST LOGIN
+					dpd.users.login({"username": uidd, "password": pass}, function(user, err) {
+					  if(err) return console.log("loggin in ERROR with:",err);
+					  console.log("loged in with:",user);
+					//THEN UPDATE TOKEN
+					  console.log("1",user.uid);
+					  console.log("2",tokenURL);
+					  dpd.users.put({"id":user.uid ,"token":tokenURL},function(result, err) {
+							if(err) return console.log("FAIL:",err);//*
+							console.log("SUCCEDED",result, result.hasInfo);
+							if(result.hasInfo)
+								if(result.hasGoal)
+									window.location.href='./protoP6goalReached.html';
+								else
+									window.location.href='./protoP3setGoal.html';
+							else
+								window.location.href='./protoP2getData.html';
+							
+						});
+					});				
+				};
+				
+				
+				
+				if(result.length === 0 || !result[0]) 
+				{// first login for this user create and login server
+				//register on deployd
+					var pass = "pass";
+					dpd.users.post({"username": userID, "password": pass ,"hasLoggedBefore":true}
+					, function(user, err) {
+						if(err) return console.log(err);
+						console.log("made user:",user);
+						console.log("userID:",user.id);
+						loginAndUpdateToken(user.username,pass,tokenRsp);
+						
+						// modify here to give a good ID when verifying access token 
+						
+					});
+							
+				}
+				else
+					loginAndUpdateToken(userID,"pass",tokenRsp);
+					
+				
+				
+				// update this client's token on the deployd server; cannot be done with POST ^
+				
+
+				
+				//login userID
+				//console.log(typeof userID);
+				//userID = p.id;
+				// don't know why but i can't login anyother user other than userID at this point
+				// now it works ~~** revision needed
+				// fac request pe userID != 100704041958754993159 si da unauthorised 401 bad credentials
+
+
+			});
+			
+			
+
+	});
+	
+	
+});
+</script>
+
+
+<script>
+
+hello.init(
+//	CLIENT_IDS,
+	{google   : '211022602923-pq5hf5f11nsgko5rbr0upna9havrko98.apps.googleusercontent.com'}
+	,
+	{
+		response_type : 'code', // make login require secret
+		oauth_proxy : 'https://auth-server.herokuapp.com/proxy',
+		scope: 'email',
+		//redirect_uri:'redirect.html'
+		redirect_uri:'http://localhost:2403/hello.js-master/redirect.html'
+	}
+);
+
+</script>
+
+<html>

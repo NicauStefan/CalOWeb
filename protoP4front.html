@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+
+<body>
+<script src="lib/hello.js"></script>
+<script src="lib/hello.then.js"></script>
+<script src="lib/modules/windows.js"></script>
+<script src="lib/modules/facebook.js"></script>
+<script src="lib/modules/google.js"></script>
+<script src="lib/moment.js"></script>
+
+<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script src="./dpd.js"></script>
+
+<button id='google' onclick=" ;">google2</button>&nbsp;
+<button id='logout' onclick="logout('google');">Logout</button><br>
+Go to <button id='goal' onclick=" ;">goal</button><br>
+Go to <button id='hist' onclick=" ;">histogram</button><br>
+Go to <button id='advice' onclick=" ;">advice</button><br><br>
+
+
+Current Date:<input id="date" name="date" />
+Observed Calories for Current Date:<span id="calOnDate"></span><br>
+<p id="dateError"></p>
+Consumed Food Quantity in Grams: <input type="number" name="milig" min="1" max="3000" value="1" id="quatiy">
+<label for="Range">Food Type:</label>
+<select name="Rng" id="Range">
+</select>
+&nbsp; which has <span id="foodCalGram"></span> calories / gram.
+<button id='save' onclick=" saveDayCal();">Add</button>
+
+
+<script>
+var loginID;
+var selectedFoodCalories = 0;
+
+var online = function(session){
+	var current_time = (new Date()).getTime() / 1000;
+	return session && session.access_token && session.expires > current_time;
+};
+
+var fb = hello( "facebook" ).getAuthResponse();
+var wl = hello( "google" ).getAuthResponse();
+
+//alert(( online(fb) ? "Signed":"Not signed") + " into FaceBook, " + ( online(wl) ? "Signed":"Not signed")+" into Google");
+if(!(online(fb) || 
+	online(wl)))
+{//  http://localhost:2403/hello.js-master/protoPage2.html
+	alert("not logged into any account please login"+online(fb) + " and "+ online(wl));
+	window.location.href='./index.html';
+
+}
+
+
+</script>
+
+<script>
+	//reachedGoal
+</script>
+
+
+<script>
+hello.on('auth.login', function(r){
+	
+	// call user information, for the given network
+
+	
+	hello( r.network ).api( '/me' ).then( function(p){
+		//console.log("function input is:"+p.thumbnail);
+		console.log(p);
+		console.log(p.id);
+		var label = document.getElementById(r.network);
+		label.innerHTML = "<img src='"+ p.thumbnail + "' width=24/>Connected to "+ r.network+" as " + p.name;
+		console.log("HI");
+		loginID = p.id;
+
+		//__Check if both GOAL and INFO are set; if not redirect to them
+		dpd.users.get({"username":loginID},function(result1){
+			//console.log("i am ",loginID," HI",result1);
+			if(!result1)
+			{
+				//__Failed Querrying users
+				console.log("ERROR - cannot conect to database for user");
+				//window.location.href='./index.html';
+				return;
+			}
+			if(result1[0])
+			{
+				if(!result1[0].hasInfo)
+					window.location.href='./protoP2getData.html';
+
+				if(!result1[0].hasGoal)
+					window.location.href='./protoP3setGoal.html';
+				
+				// check if GOALdate has been reached 
+				dpd.usergoal.get({"userID":loginID}, function (result) {
+					console.log("Querrying USERGOAL for reachedGoal:",result[0].reachedGoal);
+					var currentDate = moment().format('YYYY-MM-DD');
+					if(result[0].dateGoal === currentDate)
+					{
+						dpd.users.put(
+									result1[0].id, 
+									{
+										"hasGoal":false	
+									},
+						function(result, err) {
+							  if(err) 
+								return console.log(err);
+							  console.log("~~~PUT~~~For users~ need new goal:", result);
+							  window.location.href='./protoP5rezult.html';
+						});									
+					}
+				});
+				
+			}
+			else
+			{
+				console.log("~~ERROR:no such USER exists in db");
+			}
+			
+		});		
+	});
+});
+</script>
+
+<script>
+</script>
+
+<script>
+	
+function logout(network){
+	hello( network ).logout(function(e){
+		console.log("logged out",e);
+		window.location.href='./index.html';
+	});
+}	
+	
+</script>
+
+<script>
+	
+	var food = $("#Range");
+	
+	//Update all food types from OBJCAL
+	dpd.objcal.get(function (result, err) {
+		if(err) return console.log(err);
+		console.log(result);
+		
+		var key;
+		var value;		
+		
+		
+		for(var i = 0 ; i < result.length ;i++)
+		{
+	
+			key = result[i].calories;//result[i].id;
+			value = result[i].name;
+			food.append($("<option></option>").attr("value",key).text(value));
+			
+		}
+		$("#foodCalGram").text(food.val());
+		
+		food.on("change",function(){
+			//<span id="foodCalGram"></span>
+			$("#foodCalGram").text(food.val());
+			console.log("~~~FOOD VAL:",food.val());
+				
+		});
+
+	});
+</script>
+<script>
+	//Update current Date shown and amount of calories in that day
+	var errMess = $("#dateError");
+	var showDate = $("#date");
+	var calOnDate = $("#calOnDate");
+	showDate.val(moment().format('YYYY-MM-DD'));
+
+	var upateCaloriesOnDate = function(){
+	
+		if (!moment(showDate.val(),'YYYY-MM-DD',true).isValid() )	
+		{
+			errMess.text("Invalid Date");
+			calOnDate.text("none");
+			console.log('~~~Invalid Date');
+			return;
+		}
+		
+		
+		
+		
+		dpd.userhistory.get({"userID":loginID,"date":showDate.val()},function(result){
+			if(!result)
+				console.log("ERRROR-CANNOT ACCESS DB");
+			if(!result[0])
+			{
+				calOnDate.text("none");
+				errMess.text("On this date the User has consumed no amount of calories");
+				return;
+			}
+			calOnDate.text(result[0].amount);
+			errMess.text("");
+		});
+	};
+	upateCaloriesOnDate();
+
+	showDate.on("change", upateCaloriesOnDate);
+	
+</script>
+
+<script>
+
+	//fac asta aici ca sa se inregistreze ziua2 daca intru pe pagina in ziua2 
+	//fara sa dau click pe butonul de update cal amount
+	//
+	//whenever a new day is reached; 
+	//calculate based on the latest day 
+	//(if no earlier day found this is first day) and create post day info in database 
+	
+
+	dpd.userhistory.get({"userID":loginID},function(result){
+				if(!result)
+					console.log("ERRROR-CANNOT ACCESS DB");	
+				if(!result[0])
+				{
+					return;
+				}
+				});
+				//	dpd.userhistory.get({"userID":loginID},function(rez){
+				//	if(!result)
+				//		console.log("ERRROR-CANNOT ACCESS DB,2nd time");
+					
+		
+	/*
+	var cT = moment().format('YYYY-MM-DD');
+	dpd.userhistory.get({"userID":loginID,"date":cT},function(result){
+			if(!result)
+				console.log("ERRROR-CANNOT ACCESS DB");
+			if(!result[0])
+			{
+				dpd.userhistory.get({"userID":loginID},function(rez){
+				if(!result)
+					console.log("ERRROR-CANNOT ACCESS DB,2nd time");
+				
+				
+				
+				});
+						
+						dpd.userhistory.post(
+						{
+							"userID":loginID,
+							"date":currentTime,
+							"amount":quatiy
+						}
+						, function(result, err) {
+							  if(err) return console.log(err);
+							  console.log("~~~POST~~~For userHistory~:",result, result.id);
+							  upateCaloriesOnDate();
+						});		
+			}
+			
+		});
+		*/
+</script>
+
+<script>
+	//function for Upating calory amount of current day from user input
+	var saveDayCal = function(){
+		
+		var currentTime = moment().format('YYYY-MM-DD');
+		var quatiy = $("#quatiy").val();
+		var food = $("#Range").val();
+		
+		
+		dpd.usergoal.get({"userID":loginID}, function (result) {
+			console.log("Querrying USERGOAL",result[0]);
+
+			dpd.userhistory.get({"userID":loginID,"date":currentTime},function(result){
+				if(!result)
+					console.log("ERRROR-CANNOT ACCESS DB");
+				if(!result[0])
+				{
+				//daca trece din day1 in day2 si da click pe update day
+				//cauta prima zi inaintea celei(noi) curente care are calorii
+				//nu exista-> asta e prima zi inregistrata
+				//din prima zi gasita extrage nr de calorii consumate in acea zi
+				//si fa update pe greutatea dedusa
+					dpd.userhistory.post(
+					{
+						"userID":loginID,
+						"date":currentTime,
+						"amount":quatiy
+					}
+					, function(result, err) {
+						  if(err) return console.log(err);
+						  console.log("~~~POST~~~For userHistory~:",result, result.id);
+						  upateCaloriesOnDate();
+					});	
+				}
+				else
+				{
+					var selectedFoodCal = $("#Range").val();
+					var amountTotal = result[0].amount + parseInt(quatiy)*selectedFoodCal;
+					dpd.userhistory.put(result[0].id,
+					{
+						"userID":loginID,
+						"date":currentTime,
+						"amount":amountTotal
+					}
+					, function(result, err) {
+						  if(err) return console.log(err);
+						  console.log("~~~POST~~~For userHistory~:",result, result.id);
+						  upateCaloriesOnDate();
+					});					
+				}
+				
+			});
+			
+			
+		});	
+		
+		console.log("going with ",quatiy," and ",food);
+	};
+</script>
+
+<script>
+
+hello.init(
+//	CLIENT_IDS,
+	{google   : '211022602923-pq5hf5f11nsgko5rbr0upna9havrko98.apps.googleusercontent.com'}
+	,
+	{
+		scope: 'email',
+		//redirect_uri:'redirect.html'
+		redirect_uri:'http://localhost:2403/hello.js-master/redirect.html'
+	}
+);
+</script>
+
+</body>

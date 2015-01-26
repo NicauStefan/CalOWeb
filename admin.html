@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+
+<body>
+<script src="lib/hello.js"></script>
+<script src="lib/hello.then.js"></script>
+<script src="lib/modules/windows.js"></script>
+<script src="lib/modules/facebook.js"></script>
+<script src="lib/modules/google.js"></script>
+
+<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script src="./dpd.js"></script>
+
+<h3>Consumable</h3>
+<form id="frm1" action="">
+name <input type="text" name="num" required><br>
+calories <input type="number" name="cal" min="0" max="9999" required><br>
+picURL <input type="text" name="url"><br>
+<input type="button" onclick="insertDB();" value="Add/Update">
+
+<script>
+
+var online = function(session){
+	var current_time = (new Date()).getTime() / 1000;
+	return session && session.access_token && session.expires > current_time;
+};
+
+var fb = hello( "facebook" ).getAuthResponse();
+var wl = hello( "google" ).getAuthResponse();
+
+//alert(( online(fb) ? "Signed":"Not signed") + " into FaceBook, " + ( online(wl) ? "Signed":"Not signed")+" into Google");
+if(!(online(fb) || 
+	online(wl)))
+{//  http://localhost:2403/protoP1.html
+	alert("not logged into any account please login"+online(fb) + " and "+ online(wl));
+	window.location.href='./index.html';
+
+}
+
+console.log("ok is logged in a social network");
+
+hello.on('auth.login', function(r){
+	
+	// call user information, for the given network
+
+	console.log("logged in waiting for ME data",r.network);
+	hello( r.network ).api( '/me' ).then( function(p){
+		//console.log("function input is:"+p.thumbnail);
+		var userID = p.id;
+		console.log("sup");
+		
+		var query = {"username":userID};
+		
+		dpd.users.get(query, function (result) {
+		
+			console.log(result,"<-is first login");
+			if(!result || !result[0]) 
+			{
+				alert("authentification error bad account,try re-logging in");
+				window.location.href='./index.html';
+			}
+			else
+			{
+				if(result[0].isAdmin == false )
+				{
+					alert("this account dosen't have admin privilages");
+					window.location.href='./index.html';
+				}
+				console.log("Logged in with admin priv");
+			}
+		});	
+			
+	});
+	
+	
+});
+
+
+//alert("good");
+//window.location.href='./protoPage3setup.html';
+</script>
+
+<script>
+
+var insertDB = function(){
+	var formData = document.getElementById("frm1");
+	var name = formData.elements["num"];
+	var cal = formData.elements["cal"];
+	var picURL = formData.elements["url"];
+/*/
+
+});
+*/
+var query = {"name":name.value}; //,"calories":parseInt(cal.value)};
+
+dpd.objcal.get(query, function (result) {
+  console.log("result:");
+  console.log(typeof result,result);
+	
+	/*/ show all fields of a object:
+for(var propName in result) {
+    propValue = result[propName];
+
+    console.log("prop: ",propName,propValue);
+}	
+	/*/
+  if( result.length == 0 || !result[0])//** modified last part
+  {
+	
+	dpd.objcal.post(
+	{"name":name.value,
+	"calories":parseInt(cal.value),
+	"picURL":""}
+	, function(result1, err) {
+		  if(err) 
+			return console.log(err);
+		  console.log(result1, result1.id);	
+	});
+  }
+  else
+  {//"000000000000000000000000"  result[0].id
+	dpd.objcal.put(result[0].id, 
+	{"name":name.value,"calories":parseInt(cal.value),"picURL":""}
+	, function(result, err) {
+		  if(err) 
+			return console.log(err);
+		  console.log(result, result.id);
+	});	
+  }
+  
+  
+});
+	
+	
+	
+	//console.log("HERe:"+name.value+"  tadaa " + cal.value );
+	//console.log(" picURL " + picURL.value);
+};
+
+
+
+</script>
+
+
+
+<script>
+
+hello.init(
+//	CLIENT_IDS,
+	{google   : '211022602923-pq5hf5f11nsgko5rbr0upna9havrko98.apps.googleusercontent.com'}
+	,
+	{
+		scope: 'email',
+		//redirect_uri:'redirect.html'
+		redirect_uri:'http://localhost:2403/hello.js-master/redirect.html'
+	}
+);
+</script>
+
+</body>

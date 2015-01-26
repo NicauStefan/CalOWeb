@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+
+<head>
+
+</head>
+
+<body>
+<p>Welcome to Cal-O-Web</p>
+<!--<script src="demos/client_ids.js"></script>
+<script src="dist/hello.all.js"></script> -->
+<script src="lib/hello.js"></script>
+<script src="lib/hello.then.js"></script>
+<script src="lib/modules/windows.js"></script>
+<script src="lib/modules/facebook.js"></script>
+<script src="lib/modules/google.js"></script>
+
+	
+<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script src="./dpd.js"></script>	
+<!--
+<p>Hi demos:</p>
+-->	
+Login with :<button id='google' onclick="redirect('google');">google</button>
+</body>
+<script>
+// Am i logged in?
+var online = function(session){
+	var current_time = (new Date()).getTime() / 1000;
+	return session && session.access_token && session.expires > current_time;
+};
+
+var fb = hello( "facebook" ).getAuthResponse();
+var wl = hello( "google" ).getAuthResponse();
+
+
+</script>
+
+<script>
+var redirect = function loginPageUrl(network){
+					hello( network ).login({
+						display:'page',
+						page_uri:'./portoP1logDB.html'
+						
+					});
+				};
+</script>
+
+
+<script>
+
+
+hello.on('auth.login', function(r){
+	
+	// call user information, for the given network
+
+	
+	hello( r.network ).api( '/me' ).then( function(p){
+		//console.log("function input is:"+p.thumbnail);
+		//console.log(p);
+		//console.log(p.expires);
+		var label = document.getElementById(r.network);
+		label.innerHTML = "<img src='"+ p.thumbnail + "' width=24/>Connected to "+ r.network+" as " + p.name
+		
+		var userID = p.id;
+		var query = {"username":userID};
+
+			dpd.users.get(query, function (result) {
+				console.log(result,"<-is first login");
+				console.log("him goal",result);
+				
+				if(result && result[0] && result[0].hasGoal == true)
+				 redirect = function loginPageUrl(network){
+						hello( network ).login({
+							display:'page',
+							page_uri:'./protoP4front.html'
+						});
+					};
+				 
+				});
+	});
+});
+
+/*
+function login(network){//login('google');
+	hello( network ).login(function(e){
+		log("login",e);
+	});
+}*/
+</script>
+
+
+
+<script>
+hello.init(
+//	CLIENT_IDS,
+	{google   : '211022602923-pq5hf5f11nsgko5rbr0upna9havrko98.apps.googleusercontent.com'}
+	,
+	{
+		response_type : 'code',
+		oauth_proxy : 'https://auth-server.herokuapp.com/proxy',
+		scope: 'email',
+		//redirect_uri:'redirect.html'
+		redirect_uri:'portoP1logDB.html' //'./redirect.html'
+	}
+);
+</script>
+<script>
+function log(name,obj){
+	document.getElementById(name).appendChild(document.createTextNode(name + ':' + JSON.stringify(obj,true,2)));
+   }
+</script>
+
