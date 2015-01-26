@@ -13,9 +13,11 @@
 
 <button id='google' onclick=" ;">google2</button>&nbsp;
 <button id='logout' onclick="logout('google');">Logout</button><br>
-Go to <button id='goal' onclick=" ;">goal</button><br>
-Go to <button id='hist' onclick=" ;">histogram</button><br>
-Go to <button id='advice' onclick=" ;">advice</button><br><br>
+Go to <button id='goal' onclick=" goToGoal();">goal</button><br>
+Go to <button id='status' onclick="goToStatus();">status</button><br>
+Go to <button id='sugestion' onclick="goToSugestions();">sugestions</button><br>
+Go to <button id='charts' onclick="goToCharts();">charts</button><br>
+<br>
 
 
 Current Date:<input id="date" name="date" />
@@ -86,12 +88,13 @@ hello.on('auth.login', function(r){
 			if(result1[0])
 			{
 				if(!result1[0].hasInfo)
-					window.location.href='./protoP2getData.html';
+					window.location.href='./page2UserInfo.html';
 
 				if(!result1[0].hasGoal)
-					window.location.href='./protoP3setGoal.html';
+					window.location.href='./page3SetGoal.html';
 				
-				// check if GOALdate has been reached 
+				// check if GOALdate has been reached
+				/*
 				dpd.usergoal.get({"userID":loginID,"active":true}, function (result) {
 					console.log("Querrying USERGOAL for reachedGoal:",result[0].reachedGoal);
 					var currentDate = moment().format('YYYY-MM-DD');
@@ -106,11 +109,11 @@ hello.on('auth.login', function(r){
 							  if(err) 
 								return console.log(err);
 							  console.log("~~~PUT~~~For users~ need new goal:", result);
-							  window.location.href='./protoP5rezult.html';
+							  window.location.href='./page4GoalReached.html';
 						});									
 					}
 				});
-				
+				*/
 			}
 			else
 			{
@@ -320,6 +323,26 @@ function logout(network){
 		
 		console.log("going with ",quatiy," and ",food);
 	};
+</script>
+
+<script>
+//redirects
+	var goToGoal = function(){
+		window.location.href='./page3SetGoal.html';
+	};
+
+	var goToStatus = function(){
+		window.location.href='./page6status.html';
+	};
+
+	var goToSugestions = function(){
+		window.location.href='./page7sugestions.html';
+	};
+
+	var goToCharts = function(){
+		window.location.href='./page8charts.html';
+	};	
+	
 </script>
 
 <script>

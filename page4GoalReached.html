@@ -12,14 +12,14 @@
 <script src="./dpd.js"></script>
 
 Goto <button id='save' onclick=" redirectToNewGoal();">Set goal</button><br>
-Goto <button id='save' onclick=" ;">None</button>
+Goto <button id='save' onclick=" postUp();">Share Goal Results</button>
 
 <p id="outputResult"></p>
 <p id="initialW"></p>
 <p id="outputMessage"></p>
 <script>
 var loginID;
-
+var netWork;
 var online = function(session){
 	var current_time = (new Date()).getTime() / 1000;
 	return session && session.access_token && session.expires > current_time;
@@ -47,14 +47,16 @@ hello.on('auth.login', function(r){
 
 	hello( r.network ).api( '/me' ).then( function(p){
 		loginID = p.id;
+		netWork = r.network;
 		console.log("got loginID");
-		console.log("");
+		console.log();
+		
 	});
 });
 </script>
 <script>
 	var redirectToNewGoal = function (){
-		window.location.href='./protoP3setGoal.html';
+		window.location.href='./page3SetGoal.html';
 	};
 </script>
 
@@ -69,12 +71,12 @@ hello.on('auth.login', function(r){
 		}
 		if(!result2[0])
 		{//no active goals
-			window.location.href='./protoP3setGoal.html';
+			window.location.href='./page3SetGoal.html';
 		}
 		currentTime = moment().format('YYYY-MM-DD');		
 		if( result2[0].dateGoal !== currentTime)
 		{
-			window.location.href='./protoP4front.html';
+			window.location.href='./page5AddFood.html';
 		}
 		
 		// Has reached the goal date; see if weight matches expectations 
@@ -279,6 +281,24 @@ hello.on('auth.login', function(r){
 
 
 
+<script>
+
+function postUp(){
+// check if current network has a post update working
+	console.log("netwW:"+netWork);
+	hello.login(netWork,{scope:'publish'}, function(){
+		// Post the contents of the form
+		hello.api(netWork+':/me/share', 'post', document.getElementById('activity_form'), function(r){
+			if(!r||r.error){
+				alert("Whoops! "+r.error.message);
+			}
+			else{
+				alert("Your message has been published to "+ netWork);
+			}
+		});
+	})
+}
+</script>
 <script>
 
 hello.init(
