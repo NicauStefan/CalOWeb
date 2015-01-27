@@ -12,16 +12,20 @@
 </div>
 
 <div class="pageContent" style="display: none;">
-<button id='google' onclick=" ;">Button</button>
+<h1>Cal-O-Web</h1>
+<img id="profilePic"  width="100" height="100" alt="None"/><br>
+<strong><h3 id="profileName"></h3></strong>
+<h4>In order to make your calculations as accurate as possible modify these fields to match your own attributes.</h4>
+<h4>Clicking <em>Submit</em> will overwrite any previous attribute input you might have provided in the past.</h4>
 <button id='logout' onclick="logout('google');">Logout</button>
 
 
 <form id="frm1" action="">
-<input type="radio" name="sex" value="male" checked>Male<br>
+<input type="radio" name="sex" value="male" checked>Male
 <input type="radio" name="sex" value="female">Female<br>
-weight in kg: <input type="number" name="kg_w" min="25" max="150" value="25" required><br>
-height in cm: <input type="number" name="cm_h" min="100" max="300" value="100" required><br>
-age in years: <input type="number" name="age_y" min="8" max="110" value="8" required><br>
+weight in kg: <input type="number" name="kg_w" min="25" max="150" value="25" style="width: 30px;" required><br>
+height in cm: <input type="number" name="cm_h" min="100" max="300" value="100" style="width: 30px;" required><br>
+age in years: <input type="number" name="age_y" min="8" max="110" value="8" style="width: 30px;" required><br>
 <br>
 <input type="radio" name="exer" value="1" checked>Little to no exercise<br>
 <input type="radio" name="exer" value="2">Light exercise (1–3 days per week)<br>
@@ -232,9 +236,12 @@ hello.on('auth.login', function(r){
 		globID = p.id;
 		console.log("just defined",globID);
 		var label = document.getElementById(r.network);
-		label.innerHTML = "<img src='"+ p.thumbnail + "' width=24/>Connected to "+ r.network+" as " + p.name;
+		$("#profilePic").attr("src", p.thumbnail);
+		$("#profileName").text(p.name);
+		//label.innerHTML = "<img src='"+ p.thumbnail + "' width=24/>Connected to "+ r.network+" as " + p.name;
 		$(".loading").hide();
 		$(".pageContent").show();
+
 	});
 	
 	

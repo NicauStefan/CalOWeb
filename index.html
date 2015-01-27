@@ -1,11 +1,29 @@
 <!DOCTYPE html>
-
+<html>
 <head>
-
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+	<link href="./redirect.css" rel="stylesheet" />
 </head>
 
 <body>
-<p>Welcome to Cal-O-Web</p>
+
+<div class="loading"><span>&bull;</span><span>&bull;</span><span>&bull;</span></div>
+<div id='wrapper' style='display:none'>
+	<p>Hi</p>
+</div>
+
+<div class="pageContent" style='display:none'>
+<h1>Cal-O-Web</h1>
+<h4>Welcome to Cal-O-Web</h4>
+<h4>We try and help you get to your desired weigth by monitoring the food you consume and give you advice acording to your status.</h4>
+<h4>Login using one of the social networks below:</h4>
+<button id='google' onclick="redirect('google');"><img src="icons/googleicon.png" height="50" width="50"/><br>google</button>
+<button id='facebook' alt="None"><img src="icons/facebookicon.png" height="50" width="50"/><br>facebook</button><br>
+
+</div>
+
+
+
 <!--<script src="demos/client_ids.js"></script>
 <script src="dist/hello.all.js"></script> -->
 <script src="lib/hello.js"></script>
@@ -14,26 +32,9 @@
 <script src="lib/modules/facebook.js"></script>
 <script src="lib/modules/google.js"></script>
 
-	
 <script src="http://code.jquery.com/jquery-latest.min.js"></script>
 <script src="./dpd.js"></script>	
-<!--
-<p>Hi demos:</p>
--->	
-Login with :<button id='google' onclick="redirect('google');">google</button>
-</body>
-<script>
-// Am i logged in?
-var online = function(session){
-	var current_time = (new Date()).getTime() / 1000;
-	return session && session.access_token && session.expires > current_time;
-};
 
-var fb = hello( "facebook" ).getAuthResponse();
-var wl = hello( "google" ).getAuthResponse();
-
-
-</script>
 
 <script>
 var redirect = function loginPageUrl(network){
@@ -49,23 +50,30 @@ var redirect = function loginPageUrl(network){
 <script>
 
 
-hello.on('auth.login', function(r){
+var z = hello.on('auth.login', function(r){
 	
 	// call user information, for the given network
 
 	
-	hello( r.network ).api( '/me' ).then( function(p){
+	z = hello( r.network ).api( '/me' ).then( function(p){
 		//console.log("function input is:"+p.thumbnail);
 		//console.log(p);
 		//console.log(p.expires);
-		var label = document.getElementById(r.network);
-		label.innerHTML = "<img src='"+ p.thumbnail + "' width=24/>Connected to "+ r.network+" as " + p.name
+		//var label = document.getElementById(r.network);
+		//label.innerHTML = "<img src='"+ p.thumbnail + "' width=24/>Connected to "+ r.network+" as " + p.name
 		
 		var userID = p.id;
 		var query = {"username":userID};
-
+		
+		$("#"+r.network).text("");
+		$("#"+r.network).append("<img height="+50+" src="+p.thumbnail+" width="+50+" ><br>"+r.network+"</img>");
+		
+		
+		$(".loading").hide();
+		$(".pageContent").show();
 
 	});
+
 });
 
 </script>
@@ -85,10 +93,12 @@ hello.init(
 		redirect_uri:'page1login.html' //'./redirect.html'
 	}
 );
+
+$(".loading").hide();
+$(".pageContent").show();
 </script>
 <script>
-function log(name,obj){
-	document.getElementById(name).appendChild(document.createTextNode(name + ':' + JSON.stringify(obj,true,2)));
-   }
-</script>
 
+</script>
+</body>
+</html>
