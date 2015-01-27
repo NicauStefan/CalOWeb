@@ -26,10 +26,10 @@
 <h4>You can add a ingredient and the amount of that ingredient that you consumed in <em>grams</em>.</h4>
 <h4></h4>
 
-Current Date:<input id="date" name="date" />
+Current Date:<input id="date" name="date" style="width: 67px;"/>
 Observed Calories for Current Date:<span id="calOnDate"></span><br>
 <p id="dateError"></p>
-Consumed Food Quantity in Grams: <input type="number" name="milig" min="1" max="3000" value="1" id="quatiy">
+Consumed Food Quantity in Grams: <input type="number" name="milig" min="1" max="3000" value="1" id="quatiy" style="width: 67px;"/>
 <label for="Range">Food Type:</label>
 <select name="Rng" id="Range">
 </select>
@@ -200,7 +200,7 @@ function logout(network){
 			if(!result[0])
 			{
 				calOnDate.text("none");
-				errMess.text("On this date the User has consumed no amount of calories");
+				errMess.text("On this date the you have consumed no amount of calories.");
 				return;
 			}
 			calOnDate.text(result[0].amount);

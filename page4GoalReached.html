@@ -79,9 +79,10 @@ hello.on('auth.login', function(r){
 	hello( r.network ).api( '/me' ).then( function(p){
 		loginID = p.id;
 		netWork = r.network;
-		console.log("got loginID");
+		console.log("got loginID",loginID);
 		console.log();
 		userObj = p;
+		calculateGoal();
 	});
 });
 </script>
@@ -94,7 +95,12 @@ hello.on('auth.login', function(r){
 
 <script>
 	//Redirect if this date the current date for the goal
-	dpd.usergoal.get({"userID":loginID,"active":true}, function (result2) {
+	
+var calculateGoal = function(){	
+
+	dpd.usergoal.get({"userID":loginID,"active":true}, function (result2) {	
+		
+		console.log("loginID:",result2);
 		if(!result2)
 		{
 			console.log("ERROR with getting user from db exiting...");
@@ -104,6 +110,7 @@ hello.on('auth.login', function(r){
 		{//no active goals
 			window.location.href='./page3SetGoal.html';
 		}
+		
 		currentTime = moment().format('YYYY-MM-DD');		
 		if( result2[0].dateGoal !== currentTime)
 		{
@@ -309,20 +316,16 @@ hello.on('auth.login', function(r){
 									}								
 								
 								}
+								
+								
+								
 								$("#initialW").text("Your weight when you set this goal:"+gc_initial+"kg");
 								console.log(goalResultMesage);
 								mes.text(goalResultMesage);
 								mes2 += "." + goalResultMesage;
 								$("#postMess").val(mes2);
+							
 								
-								/*
-								if( goal_weight == deduced_weight )
-									console.log("YOU DID WELL !! GOAL REACHED. YOU NOW HAVE " + goal_weight);
-								else if( goal_weight >= deduced_weight ) 
-										console.log("You did not reach your goal, you wanted to reach ",goal_weight," but you have",deduced_weight);
-									else
-										console.log("You surpassed your goal, of ",goal_weight," with ",deduced_weight);
-								*/
 								$("#profilePic").attr("src", userObj.thumbnail);
 								$("#profileName").text(userObj.name);		
 								
@@ -343,6 +346,7 @@ hello.on('auth.login', function(r){
 			
 		});
 	});	
+}
 </script>
 
 <script>

@@ -1,6 +1,7 @@
 html
 {
-	background: #eee;
+	background-image: url("icons/wallpaper.jpg");
+	
 	height: 100%;
 }
 
@@ -42,10 +43,10 @@ body
 	animation-delay: 1s;
 
 }
-radio {
-
+.pageContent
+{
+	color: #483D8B;
 }
-
 p,h2
 {
 	animation: fadein .5s 3s;
@@ -53,11 +54,12 @@ p,h2
 	font-family: helvetica;
 	opacity: 0;
 	text-align: center;
-
+	color: #483D8B;
 }
 p,h4
 {
 	animation-delay: 1s;
+	color: #483D8B;
 }
 .overflow
 {

@@ -94,6 +94,10 @@ hello.on('auth.login', function(r){
 					  dpd.users.put({"id":user.uid ,"token":tokenURL},function(result, err) {
 							if(err) return console.log("FAIL:",err);//*
 							console.log("SUCCEDED",result, result.hasInfo);
+							
+							console.log("dose he have a goal?:",result.hasGoal,result);
+							
+							
 							if(result.hasInfo)
 								if(result.hasGoal)
 									window.location.href='./page4GoalReached.html';
