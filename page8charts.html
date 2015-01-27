@@ -12,14 +12,14 @@
 <script src="http://code.jquery.com/jquery-latest.min.js"></script>
 <script src="./dpd.js"></script>
 
-<button id='google' onclick=" ;">google2</button>
-<button id='goal' onclick=" ;">goal</button>
-<button id='hist' onclick=" ;">histogram</button>
-<button id='advice' onclick=" ;">advice</button>
+Go to <button id='info' onclick=" goToInfo();">hbe info</button><br>
+Go to <button id='goal' onclick=" goToGoal();">goal</button><br>
+Go to <button id='status' onclick="goToStatus();">status</button><br>
+Go to <button id='sugestion' onclick="goToSugestions();">sugestions</button><br>
+Go to <button id='consumables' onclick="goToConsumables();">add consumables</button><br>
 
-<button id='logout' onclick="logout('google');">Logout</button>
-
-
+<br>
+<br><br>
 <canvas id="myChart" width="400" height="400"></canvas>
 
 
@@ -294,7 +294,29 @@ function logout(network){
 	
 </script>
 
+<script>
+//redirects
+	var goToInfo = function(){
+		window.location.href='./page2UserInfo.html';
+	};
 
+	var goToGoal = function(){
+		window.location.href='./page3SetGoal.html';
+	};
+
+	var goToStatus = function(){
+		window.location.href='./page6status.html';
+	};
+
+	var goToSugestions = function(){
+		window.location.href='./page7sugestions.html';
+	};
+
+	var goToConsumables = function(){
+		window.location.href='./page5AddFood.html';
+	};
+	
+</script>
 
 <script>
 

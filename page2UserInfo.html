@@ -1,22 +1,19 @@
 <!DOCTYPE html>
 
 <body>
-<script src="lib/hello.js"></script>
-<script src="lib/hello.then.js"></script>
-<script src="lib/modules/windows.js"></script>
-<script src="lib/modules/facebook.js"></script>
-<script src="lib/modules/google.js"></script>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+	<link href="./redirect.css" rel="stylesheet" />
+</head>
 
-<!--
-<script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
-<script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
--->
-<script src="http://code.jquery.com/jquery-latest.min.js"></script>
-<script src="./dpd.js"></script>
+<div class="loading"><span>&bull;</span><span>&bull;</span><span>&bull;</span></div>
+<div id='wrapper' style='display:none'>
+	<p>Hi</p>
+</div>
 
+<div class="pageContent" style="display: none;">
 <button id='google' onclick=" ;">Button</button>
 <button id='logout' onclick="logout('google');">Logout</button>
-
 
 
 <form id="frm1" action="">
@@ -34,7 +31,17 @@ age in years: <input type="number" name="age_y" min="8" max="110" value="8" requ
 <input type="button" onclick="insertDB();" value="Submit">
 </form>
 
+</div>
 
+<script src="lib/hello.js"></script>
+<script src="lib/hello.then.js"></script>
+<script src="lib/modules/windows.js"></script>
+<script src="lib/modules/facebook.js"></script>
+<script src="lib/modules/google.js"></script>
+
+
+<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script src="./dpd.js"></script>
 <script>
 var globID;
 var redirectNext = function(result1)
@@ -226,6 +233,8 @@ hello.on('auth.login', function(r){
 		console.log("just defined",globID);
 		var label = document.getElementById(r.network);
 		label.innerHTML = "<img src='"+ p.thumbnail + "' width=24/>Connected to "+ r.network+" as " + p.name;
+		$(".loading").hide();
+		$(".pageContent").show();
 	});
 	
 	

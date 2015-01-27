@@ -64,31 +64,10 @@ hello.on('auth.login', function(r){
 		var userID = p.id;
 		var query = {"username":userID};
 
-		/*
-			dpd.users.get(query, function (result) {
-				console.log(result,"<-is first login");
-				console.log("him goal",result);
 
-				
-				if(result && result[0] && result[0].hasGoal == true)
-				 redirect = function loginPageUrl(network){
-						hello( network ).login({
-							display:'page',
-							page_uri:'./page4GoalReached.html'
-						});
-					};
-				 
-				});
-		*/
 	});
 });
 
-/*
-function login(network){//login('google');
-	hello( network ).login(function(e){
-		log("login",e);
-	});
-}*/
 </script>
 
 
