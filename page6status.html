@@ -29,6 +29,7 @@
 <h2 id="weightToday"></h2>
 
 </div>
+<script src="lib/client_ids.js"></script>
 
 <script src="lib/hello.js"></script>
 <script src="lib/hello.then.js"></script>
@@ -142,6 +143,11 @@ hello.on('auth.login', function(r){
 				if(!result1)
 					console.log("ERRROR-CANNOT ACCESS DB");
 
+				if(!result1.length == 0 )
+				{
+					$("#weightToday").text("No calories found for any day	,go to the add consumables page and add some food.");
+					return;
+				}
 				//exercises 			
 				
 				var weightBMR;
@@ -210,7 +216,7 @@ hello.on('auth.login', function(r){
 				console.log("	Comparing Final deduced weight in KG:",deduced_weight," with goal weight in KG:",goal_weight)
 				
 				$("#dateToday").text("Today is "+currentTime);
-				var message = "Your current weight should be :"+deduced_weight;
+				var message = "Your current weight should be :"+deduced_weight+"kg";
 				var dif;
 				
 				
@@ -234,7 +240,7 @@ hello.on('auth.login', function(r){
 				if( deduced_weight > goal_weight )
 				{//goal surpassed
 					dif = deduced_weight - goal_weight;
-					message += " you need to loose "+dif+" in the next "+daysLeft + syntaxForDay;
+					message += " you need to loose "+dif+"kg in the next "+daysLeft + syntaxForDay;
 				}
 				else if( deduced_weight == goal_weight )
 				{//goal on scheduel
@@ -255,7 +261,7 @@ hello.on('auth.login', function(r){
 					if( deduced_weight > goal_weight )
 					{//goal surpassed
 						dif = deduced_weight - goal_weight;
-						message += " you need to loose "+dif+" in the next "+daysLeft+" days";
+						message += " you need to loose "+dif+"kg in the next "+daysLeft+" days";
 					}
 					else if( deduced_weight == goal_weight )
 					{//goal on scheduel
@@ -332,13 +338,13 @@ function logout(network){
 <script>
 
 hello.init(
-//	CLIENT_IDS,
-	{google   : '211022602923-pq5hf5f11nsgko5rbr0upna9havrko98.apps.googleusercontent.com'}
+	CLIENT_IDS
+//	{google   : '211022602923-pq5hf5f11nsgko5rbr0upna9havrko98.apps.googleusercontent.com'}
 	,
 	{
 		scope: 'email',
 		//redirect_uri:'redirect.html'
-		redirect_uri:'http://localhost:2403/hello.js-master/redirect.html'
+		redirect_uri:'redirect.html'
 	}
 );
 </script>

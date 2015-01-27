@@ -18,14 +18,14 @@
 <h4>We try and help you get to your desired weigth by monitoring the food you consume and give you advice acording to your status.</h4>
 <h4>Login using one of the social networks below:</h4>
 <button id='google' onclick="redirect('google');"><img src="icons/googleicon.png" height="50" width="50"/><br>google</button>
-<button id='facebook' alt="None"><img src="icons/facebookicon.png" height="50" width="50"/><br>facebook</button><br>
+<button id='facebook' onclick="redirect('facebook');"><img src="icons/facebookicon.png" height="50" width="50"/><br>facebook</button><br>
 
 </div>
 
 
 
-<!--<script src="demos/client_ids.js"></script>
-<script src="dist/hello.all.js"></script> -->
+<script src="lib/client_ids.js"></script>
+
 <script src="lib/hello.js"></script>
 <script src="lib/hello.then.js"></script>
 <script src="lib/modules/windows.js"></script>
@@ -82,8 +82,8 @@ var z = hello.on('auth.login', function(r){
 
 <script>
 hello.init(
-//	CLIENT_IDS,
-	{google   : '211022602923-pq5hf5f11nsgko5rbr0upna9havrko98.apps.googleusercontent.com'}
+	CLIENT_IDS
+	//{google   : '211022602923-pq5hf5f11nsgko5rbr0upna9havrko98.apps.googleusercontent.com'}
 	,
 	{
 		response_type : 'code',

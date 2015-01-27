@@ -26,6 +26,15 @@
 <h2 id="outputMessage"></h2>
 
 </div>
+<div style="display: none;">
+	<form id="activity_form">
+		<label >message</label> <input id="postMess" type="text" name="message" value="Hello.js is anything but OAuth'ful"/>
+		<br />
+		<label>link</label> <input type="url" name="link" value="http://cal-o-web.herokuapp.com"/>
+	</form>
+</div>
+<script src="lib/client_ids.js"></script>
+
 <script src="lib/hello.js"></script>
 <script src="lib/hello.then.js"></script>
 <script src="lib/modules/windows.js"></script>
@@ -41,6 +50,7 @@
 var loginID;
 var netWork;
 var userObj;
+var resultMess;
 var online = function(session){
 	var current_time = (new Date()).getTime() / 1000;
 	return session && session.access_token && session.expires > current_time;
@@ -97,7 +107,7 @@ hello.on('auth.login', function(r){
 		currentTime = moment().format('YYYY-MM-DD');		
 		if( result2[0].dateGoal !== currentTime)
 		{
-			window.location.href='./page5AddFood.html';
+			//window.location.href='./page5AddFood.html';
 		}
 		
 		// Has reached the goal date; see if weight matches expectations 
@@ -218,7 +228,7 @@ hello.on('auth.login', function(r){
 								
 								var mes = $("#outputMessage");outputResult
 								var goalResultMesage = "";
-								
+								var mes2;
 								if( goal_weight == deduced_weight )
 								{//succeded
 									goalResultMesage = "You now have " + goal_weight + "kg";
@@ -229,7 +239,8 @@ hello.on('auth.login', function(r){
 										word = "maintain";
 									else 
 										word = "lose";
-									$("#outputResult").text("You did well!!You have "+word+" desired weight Goal Reached");
+									mes2 = "You did well!!You have "+word+" desired weight Goal Reached";
+									$("#outputResult").text(mes2);
 								} 
 								else if( goal_type > 0 )
 								{// gain weight
@@ -238,13 +249,15 @@ hello.on('auth.login', function(r){
 									{	
 										var diff = goal_weight - deduced_weight;
 										goalResultMesage = "Your current weight should be :"+deduced_weight+"kg, you needed to gain "+diff+"kg more";
-										$("#outputResult").text("You did not gain enough");
+										mes2 = "You did not gain enough";
+										$("#outputResult").text(mes2);
 									}
 									else
 									{
 										var diff = deduced_weight - goal_weight;
 										goalResultMesage = "Your current weight should be :"+deduced_weight+"kg, you gained "+diff+"kg too much";
-										$("#outputResult").text("You gained too much");
+										mes2 = "You gained too much";
+										$("#outputResult").text(mes2);
 									}
 								}
 								else if (goal_type == 0)	// maintain weight
@@ -253,13 +266,15 @@ hello.on('auth.login', function(r){
 									{	
 										var diff = goal_weight - deduced_weight;
 										goalResultMesage = "Your current weight should be:"+deduced_weight+"kg, your lost " + diff + "kg weight";
-										$("#outputResult").text("You did not maintain your weight");
+										mes2 = "You did not maintain your weight";
+										$("#outputResult").text(mes2);
 									}
 									else
 									{
 										var diff = deduced_weight - goal_weight;
 										goalResultMesage = "Your current weight should be :"+deduced_weight+"kg you gained "+diff+"kg too much";
-										$("#outputResult").text("You did not maintain your weight");
+										mes2 = "You did not maintain your weight";
+										$("#outputResult").text(mes2);
 									}
 								}
 								else	//lose weight
@@ -268,19 +283,23 @@ hello.on('auth.login', function(r){
 									{	
 										var diff = goal_weight - deduced_weight;
 										goalResultMesage = "Your current weight should be:"+deduced_weight+"kg, your lost " + diff + "kg too much";
-										$("#outputResult").text("You lost too much weight");
+										mes2 = "You lost too much weight";
+										$("#outputResult").text(mes2);
 									}
 									else
 									{
 										var diff = deduced_weight - goal_weight;
 										goalResultMesage = "Your current weight should be :"+deduced_weight+"kg you needed to loose "+diff+"kg more";
-										$("#outputResult").text("You did not lose enough weight");
+										mes2 = "You did not lose enough weight";
+										$("#outputResult").text(mes2);
 									}								
 								
 								}
 								$("#initialW").text("Your weight when you set this goal:"+gc_initial+"kg");
 								console.log(goalResultMesage);
 								mes.text(goalResultMesage);
+								mes2 += "." + goalResultMesage;
+								$("#postMess").val(mes2);
 								
 								/*
 								if( goal_weight == deduced_weight )
@@ -330,7 +349,7 @@ function postUp(){
 	console.log("netwW:"+netWork);
 	hello.login(netWork,{scope:'publish'}, function(){
 		// Post the contents of the form
-		hello.api(netWork+':/me/share', 'post', document.getElementById('activity_form'), function(r){
+		hello.api(netWork+':/me/share', 'post', document.getElementById('activity_form') , function(r){
 			if(!r||r.error){
 				alert("Whoops! "+r.error.message);
 			}
@@ -344,13 +363,13 @@ function postUp(){
 <script>
 
 hello.init(
-//	CLIENT_IDS,
-	{google   : '211022602923-pq5hf5f11nsgko5rbr0upna9havrko98.apps.googleusercontent.com'}
+	CLIENT_IDS
+	//{google   : '211022602923-pq5hf5f11nsgko5rbr0upna9havrko98.apps.googleusercontent.com'}
 	,
 	{
 		scope: 'email',
 		//redirect_uri:'redirect.html'
-		redirect_uri:'http://localhost:2403/hello.js-master/redirect.html'
+		redirect_uri:'redirect.html'
 	}
 );
 </script>

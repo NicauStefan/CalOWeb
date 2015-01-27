@@ -13,6 +13,8 @@
 
 </body>
 
+<script src="lib/client_ids.js"></script>
+
 <script src="lib/hello.js"></script>
 <script src="lib/hello.then.js"></script>
 <script src="lib/modules/windows.js"></script>
@@ -153,15 +155,15 @@ hello.on('auth.login', function(r){
 <script>
 
 hello.init(
-//	CLIENT_IDS,
-	{google   : '211022602923-pq5hf5f11nsgko5rbr0upna9havrko98.apps.googleusercontent.com'}
+	CLIENT_IDS
+	//{google   : '211022602923-pq5hf5f11nsgko5rbr0upna9havrko98.apps.googleusercontent.com'}
 	,
 	{
 		response_type : 'code', // make login require secret
 		oauth_proxy : 'https://auth-server.herokuapp.com/proxy',
 		scope: 'email',
 		//redirect_uri:'redirect.html'
-		redirect_uri:'http://localhost:2403/hello.js-master/redirect.html'
+		redirect_uri:'page1login.html'
 	}
 );
 
