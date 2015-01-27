@@ -218,24 +218,9 @@ function logout(network){
 	//fac asta aici ca sa se inregistreze ziua2 daca intru pe pagina in ziua2 
 	//fara sa dau click pe butonul de update cal amount
 	//
-	//whenever a new day is reached; 
-	//calculate based on the latest day 
-	//(if no earlier day found this is first day) and create post day info in database 
-	
 
-	dpd.userhistory.get({"userID":loginID},function(result){
-				if(!result)
-					console.log("ERRROR-CANNOT ACCESS DB");	
-				if(!result[0])
-				{
-					return;
-				}
-				});
-				//	dpd.userhistory.get({"userID":loginID},function(rez){
-				//	if(!result)
-				//		console.log("ERRROR-CANNOT ACCESS DB,2nd time");
-					
-		
+
+
 	/*
 	var cT = moment().format('YYYY-MM-DD');
 	dpd.userhistory.get({"userID":loginID,"date":cT},function(result){

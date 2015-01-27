@@ -107,6 +107,7 @@ hello.on('auth.login', function(r){
 				console.log("~~ERROR:no such USER exists in db");
 			}
 			
+			doAllForSugestions();
 		});
 		
 		
@@ -116,6 +117,10 @@ hello.on('auth.login', function(r){
 </script>
 
 <script>
+
+
+var doAllForSugestions = function(){
+
 
 	dpd.usergoal.get({"userID":loginID,"active":true}, function (result2) {
 		if(!result2)
@@ -211,7 +216,7 @@ hello.on('auth.login', function(r){
 				var deduced_weight = Math.round(gc_curent);
 				console.log("	Comparing Final deduced weight in KG:",deduced_weight," with goal weight in KG:",goal_weight)
 				
-				var message;
+				var message = "";
 				var dif;
 				
 				
@@ -220,6 +225,15 @@ hello.on('auth.login', function(r){
 				var dateGoal = moment(result2[0].dateGoal);
 				var syntaxForDay;
 				var daysLeft = dateGoal.diff(dateLast,'days');
+				
+				
+				if( result1[result1.length - 1].amount <= 1200 )
+					message = "Consuming less than 1200 calories can be unhealthy try consuming more per day.";
+				
+				if( result1[result1.length - 1].amount >= 3000 )
+					message = "Consuming more than 3000 calories can be unhealthy try consuming less per day.";
+								
+					
 				if(daysLeft == 1)
 				{
 					console.log("Day left till goal: ",dateGoal.diff(dateLast,'day'));
@@ -256,16 +270,16 @@ hello.on('auth.login', function(r){
 					
 					if( deduced_weight > goal_weight )
 					{//goal surpassed
-						message = "You consumed more than your goal,you should consume items with a smaller calori value";
+						message += "You consumed more than your goal,you should consume items with a smaller calori value";
 					}
 					else if( deduced_weight == goal_weight )
 					{//goal on scheduel
 					
-						message = "You have your desired weight, keep up your diet!";
+						message += "You have your desired weight, keep up your diet!";
 					}
 					else //goal not reached; eat more
 					{
-						message = "You need to consume more food with a greater calori intake";
+						message += "You need to consume more food with a greater calori intake";
 					}
 				}
 				else if(goal_type == 0)
@@ -273,16 +287,16 @@ hello.on('auth.login', function(r){
 
 					if( deduced_weight > goal_weight )
 					{//goal surpassed
-						message = "You should stop consuming so much.In order to keep your initial diet try eating items with a smaller calori value";
+						message += "You should stop consuming so much.In order to keep your initial diet try eating items with a smaller calori value";
 					}
 					else if( deduced_weight == goal_weight )
 					{//goal on scheduel
 					
-						message = "You have reached your desired weight, you are on the right track, keep up your current diet!";
+						message += "You have reached your desired weight, you are on the right track, keep up your current diet!";
 					}
 					else //goal not reached; eat more
 					{
-						message = "You need to consume more food with a greater calori intake to reach again your initial weight";
+						message += "You need to consume more food with a greater calori intake to reach again your initial weight";
 					}			
 				
 				}
@@ -290,16 +304,16 @@ hello.on('auth.login', function(r){
 				{//loose weight
 					if( deduced_weight > goal_weight )
 					{//goal surpassed
-						message = "You have not lost enough weight yet, try eatubg items with a lesser value";
+						message += "You have not lost enough weight yet, try eatubg items with a lesser value";
 					}
 					else if( deduced_weight == goal_weight )
 					{//goal on scheduel
 					
-						message = "You have reached your desired weight, you are on the right track, keep up your current diet!";
+						message += "You have reached your desired weight, you are on the right track, keep up your current diet!";
 					}
 					else //goal not reached; eat more
 					{
-						message = "You need to consume more food with a greater calori intake to reach again your initial weight";
+						message += "You need to consume more food with a greater calori intake to reach again your initial weight";
 					}
 				}
 				
@@ -317,6 +331,7 @@ hello.on('auth.login', function(r){
 				});
 			});
 	});
+}	
 </script>
 
 <script>

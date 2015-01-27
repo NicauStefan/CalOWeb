@@ -106,13 +106,16 @@ hello.on('auth.login', function(r){
 			{
 				console.log("~~ERROR:no such USER exists in db");
 			}
-			
+			doAllChart();
 		});		
 	});
 });
 </script>
 
 <script>
+
+var doAllChart = function(){
+
 	dpd.usergoal.get({"userID":loginID,"active":true}, function (result2) {
 		if(!result2)
 		{
@@ -142,6 +145,16 @@ hello.on('auth.login', function(r){
 
 				//exercises 			
 				
+				if(result1.length <= 1)
+				{
+					$("#message").text("You need data from at least 2 days to make a chart.");
+					$("#profilePic").attr("src", pers.thumbnail);
+					$("#profileName").text(pers.name);		
+					
+					$(".loading").hide();
+					$(".pageContent").show();				
+					return;
+				}
 				var weightBMR;
 				var BMR_const;
 				var BMR;
@@ -303,6 +316,7 @@ hello.on('auth.login', function(r){
 				});
 		});
 	});
+}
 </script>
 
 <script>

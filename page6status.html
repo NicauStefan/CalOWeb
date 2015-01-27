@@ -43,6 +43,7 @@
 
 <script>
 var loginID;
+var person;
 var online = function(session){
 	var current_time = (new Date()).getTime() / 1000;
 	return session && session.access_token && session.expires > current_time;
@@ -80,7 +81,8 @@ hello.on('auth.login', function(r){
 		
 		console.log("HI");
 		loginID = p.id;
-
+		person = p;
+		
 		//__Check if both GOAL and INFO are set; if not redirect to them
 		dpd.users.get({"username":loginID},function(result1){
 			//console.log("i am ",loginID," HI",result1);
@@ -104,17 +106,18 @@ hello.on('auth.login', function(r){
 			{
 				console.log("~~ERROR:no such USER exists in db");
 			}
-			$("#profilePic").attr("src", p.thumbnail);
-			$("#profileName").text(p.name);		
 			
-			$(".loading").hide();
-			$(".pageContent").show();	
+			doAllForStatus();
+			
+
 		});		
 	});
 });
 </script>
 
 <script>
+
+var doAllForStatus = function (){
 
 	dpd.usergoal.get({"userID":loginID,"active":true}, function (result2) {
 		if(!result2)
@@ -148,6 +151,13 @@ hello.on('auth.login', function(r){
 				if(result1.length == 0 )
 				{
 					$("#weightToday").text("No calories found for any day	,go to the add consumables page and add some food.");
+					
+					$("#profilePic").attr("src", person.thumbnail);
+					$("#profileName").text(person.name);		
+					
+					$(".loading").hide();
+					$(".pageContent").show();
+					
 					return;
 				}
 				//exercises 			
@@ -258,6 +268,13 @@ hello.on('auth.login', function(r){
 				
 				$("#weightToday").text(message);
 				
+				$("#profilePic").attr("src", person.thumbnail);
+				$("#profileName").text(person.name);		
+				
+				$(".loading").hide();
+				$(".pageContent").show();
+
+				
 				/*
 				if( goal_type > 0 )
 				{// gain
@@ -296,6 +313,8 @@ hello.on('auth.login', function(r){
 			});
 
 		});
+		
+}
 </script>
 
 <script>
