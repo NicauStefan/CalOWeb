@@ -142,13 +142,17 @@ hello.on('auth.login', function(r){
 			dpd.userhistory.get({"userID":loginID},function(result1){
 				if(!result1)
 					console.log("ERRROR-CANNOT ACCESS DB");
-
-				if(!result1.length == 0 )
+				
+	
+				
+				if(result1.length == 0 )
 				{
 					$("#weightToday").text("No calories found for any day	,go to the add consumables page and add some food.");
 					return;
 				}
 				//exercises 			
+				
+				
 				
 				var weightBMR;
 				var BMR_const;

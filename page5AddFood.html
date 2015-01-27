@@ -91,7 +91,8 @@ hello.on('auth.login', function(r){
 		//label.innerHTML = "<img src='"+ p.thumbnail + "' width=24/>Connected to "+ r.network+" as " + p.name;
 		console.log("HI");
 		loginID = p.id;
-
+		console.log("LOGIN ID:",loginID);
+		upateCaloriesOnDate();
 		//__Check if both GOAL and INFO are set; if not redirect to them
 		dpd.users.get({"username":loginID},function(result1){
 			//console.log("i am ",loginID," HI",result1);
@@ -195,6 +196,7 @@ function logout(network){
 		dpd.userhistory.get({"userID":loginID,"date":showDate.val()},function(result){
 			if(!result)
 				console.log("ERRROR-CANNOT ACCESS DB");
+
 			if(!result[0])
 			{
 				calOnDate.text("none");
@@ -205,7 +207,7 @@ function logout(network){
 			errMess.text("");
 		});
 	};
-	upateCaloriesOnDate();
+	
 
 	showDate.on("change", upateCaloriesOnDate);
 	
@@ -288,11 +290,13 @@ function logout(network){
 				//nu exista-> asta e prima zi inregistrata
 				//din prima zi gasita extrage nr de calorii consumate in acea zi
 				//si fa update pe greutatea dedusa
+					var selectedFoodCal = $("#Range").val();
+					var amountTotal = parseInt(quatiy)*selectedFoodCal; 
 					dpd.userhistory.post(
 					{
 						"userID":loginID,
 						"date":currentTime,
-						"amount":quatiy
+						"amount":amountTotal
 					}
 					, function(result, err) {
 						  if(err) return console.log(err);
@@ -303,6 +307,7 @@ function logout(network){
 				else
 				{
 					var selectedFoodCal = $("#Range").val();
+					console.log("selected:",selectedFoodCal);
 					var amountTotal = result[0].amount + parseInt(quatiy)*selectedFoodCal;
 					dpd.userhistory.put(result[0].id,
 					{

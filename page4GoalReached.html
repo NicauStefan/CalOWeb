@@ -28,7 +28,7 @@
 </div>
 <div style="display: none;">
 	<form id="activity_form">
-		<label >message</label> <input id="postMess" type="text" name="message" value="Hello.js is anything but OAuth'ful"/>
+		<label >message</label> <input id="postMess" type="text" name="message" value="You need to provide at least what you consumed in a day."/>
 		<br />
 		<label>link</label> <input type="url" name="link" value="http://cal-o-web.herokuapp.com"/>
 	</form>
@@ -107,7 +107,7 @@ hello.on('auth.login', function(r){
 		currentTime = moment().format('YYYY-MM-DD');		
 		if( result2[0].dateGoal !== currentTime)
 		{
-			//window.location.href='./page5AddFood.html';
+			window.location.href='./page5AddFood.html';
 		}
 		
 		// Has reached the goal date; see if weight matches expectations 
@@ -121,13 +121,15 @@ hello.on('auth.login', function(r){
 				return;
 				//window.location.href='./index.html';
 			}
-			console.log("~~~GET~~~For userHBE~:",result);
+			console.log("~~~GET~~~For userHBE~:",result," login id:",loginID);
 			dpd.userhistory.get({"userID":loginID},function(result1){
 				if(!result1)
 					console.log("ERRROR-CANNOT ACCESS DB");
 
 				//exercises 			
-				
+
+
+
 				var weightBMR;
 				var BMR_const;
 				var BMR;
@@ -225,6 +227,18 @@ hello.on('auth.login', function(r){
 								
 								//Give user message in regards to his goal reached or not;
 								//
+								// check here so that his current goal gets deactivated
+								if(result1.length == 0)
+								{
+									var mes2 = "You need to provide at least what you consumed in a day.";
+									$("#outputResult").text(mes2);
+									$("#profilePic").attr("src", userObj.thumbnail);
+									$("#profileName").text(userObj.name);		
+								
+									$(".loading").hide();
+									$(".pageContent").show();									
+									return;
+								}	
 								
 								var mes = $("#outputMessage");outputResult
 								var goalResultMesage = "";
