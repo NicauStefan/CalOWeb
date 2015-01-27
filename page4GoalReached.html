@@ -1,6 +1,31 @@
 <!DOCTYPE html>
-
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+	<link href="./redirect.css" rel="stylesheet" />
+</head>
 <body>
+
+
+<div class="loading"><span>&bull;</span><span>&bull;</span><span>&bull;</span></div>
+<div id='wrapper' style='display:none'>
+	<p>Hi</p>
+</div>
+
+<div class="pageContent" style="display: none;">
+<h1>Cal-O-Web</h1>
+<img id="profilePic"  width="100" height="100" alt="None"/><br>
+<strong><h3 id="profileName"></h3></strong>
+<button id='logout' onclick="logout('google');">Logout</button>
+
+<button id='save' onclick=" redirectToNewGoal();">Set goal</button><br>
+<button id='save' onclick=" postUp();">Share Goal Results</button>
+
+<h2 id="outputResult"></h2>
+<h2 id="initialW"></h2>
+<h2 id="outputMessage"></h2>
+
+</div>
 <script src="lib/hello.js"></script>
 <script src="lib/hello.then.js"></script>
 <script src="lib/modules/windows.js"></script>
@@ -11,15 +36,11 @@
 <script src="http://code.jquery.com/jquery-latest.min.js"></script>
 <script src="./dpd.js"></script>
 
-Goto <button id='save' onclick=" redirectToNewGoal();">Set goal</button><br>
-Goto <button id='save' onclick=" postUp();">Share Goal Results</button>
 
-<p id="outputResult"></p>
-<p id="initialW"></p>
-<p id="outputMessage"></p>
 <script>
 var loginID;
 var netWork;
+var userObj;
 var online = function(session){
 	var current_time = (new Date()).getTime() / 1000;
 	return session && session.access_token && session.expires > current_time;
@@ -50,7 +71,7 @@ hello.on('auth.login', function(r){
 		netWork = r.network;
 		console.log("got loginID");
 		console.log();
-		
+		userObj = p;
 	});
 });
 </script>
@@ -200,7 +221,7 @@ hello.on('auth.login', function(r){
 								
 								if( goal_weight == deduced_weight )
 								{//succeded
-									goalResultMesage = "YOU NOW HAVE " + goal_weight;
+									goalResultMesage = "You now have " + goal_weight + "kg";
 									var word;
 									if( goal_type > 0 )
 										word = "gain";
@@ -208,7 +229,7 @@ hello.on('auth.login', function(r){
 										word = "maintain";
 									else 
 										word = "lose";
-									$("#outputResult").text("YOU DID WELL !!You have "+word+" desired weight GOAL REACHED");
+									$("#outputResult").text("You did well!!You have "+word+" desired weight Goal Reached");
 								} 
 								else if( goal_type > 0 )
 								{// gain weight
@@ -268,7 +289,12 @@ hello.on('auth.login', function(r){
 										console.log("You did not reach your goal, you wanted to reach ",goal_weight," but you have",deduced_weight);
 									else
 										console.log("You surpassed your goal, of ",goal_weight," with ",deduced_weight);
-								*/	
+								*/
+								$("#profilePic").attr("src", userObj.thumbnail);
+								$("#profileName").text(userObj.name);		
+								
+								$(".loading").hide();
+								$(".pageContent").show();	
 							});
 						
 					});
@@ -286,7 +312,16 @@ hello.on('auth.login', function(r){
 	});	
 </script>
 
-
+<script>
+	
+function logout(network){
+	hello( network ).logout(function(e){
+		console.log("logged out",e);
+		window.location.href='./index.html';
+	});
+}	
+	
+</script>
 
 <script>
 
@@ -320,3 +355,4 @@ hello.init(
 );
 </script>
 </body>
+</html>

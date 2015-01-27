@@ -1,6 +1,35 @@
 <!DOCTYPE html>
-
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+	<link href="./redirect.css" rel="stylesheet" />
+</head>
 <body>
+
+
+<div class="loading"><span>&bull;</span><span>&bull;</span><span>&bull;</span></div>
+<div id='wrapper' style='display:none'>
+	<p>Hi</p>
+</div>
+
+<div class="pageContent" style="display: none;">
+<h1>Cal-O-Web</h1>
+<img id="profilePic"  width="100" height="100" alt="None"/><br>
+<strong><h3 id="profileName"></h3></strong>
+<button id='logout' onclick="logout('google');">Logout</button><br>
+
+<button id='info' onclick=" goToInfo();">hbe info</button>
+<button id='goal' onclick=" goToGoal();">goal</button>
+<button id='status' onclick="goToStatus();">status</button>
+<button id='consumables' onclick="goToConsumables();">add consumables</button>
+<button id='charts' onclick="goToCharts();">charts</button><br>
+<br>
+
+<h2 id="message"></h2>
+
+
+</div>
+
 <script src="lib/hello.js"></script>
 <script src="lib/hello.then.js"></script>
 <script src="lib/modules/windows.js"></script>
@@ -10,21 +39,9 @@
 
 <script src="http://code.jquery.com/jquery-latest.min.js"></script>
 <script src="./dpd.js"></script>
-
-<button id='google' onclick=" ;">google2</button>&nbsp;
-<button id='logout' onclick="logout('google');">Logout</button><br>
-
-Go to <button id='info' onclick=" goToInfo();">hbe info</button><br>
-Go to <button id='goal' onclick=" goToGoal();">goal</button><br>
-Go to <button id='status' onclick="goToStatus();">status</button><br>
-Go to <button id='consumables' onclick="goToConsumables();">add consumables</button><br>
-Go to <button id='charts' onclick="goToCharts();">charts</button><br>
-<br>
-
-<p id="message"></p>
-
 <script>
 var loginID;
+var personInfo;
 var online = function(session){
 	var current_time = (new Date()).getTime() / 1000;
 	return session && session.access_token && session.expires > current_time;
@@ -50,6 +67,7 @@ if(!(online(fb) ||
 
 
 <script>
+
 hello.on('auth.login', function(r){
 	
 	// call user information, for the given network
@@ -59,11 +77,11 @@ hello.on('auth.login', function(r){
 		//console.log("function input is:"+p.thumbnail);
 		console.log(p);
 		console.log(p.id);
-		var label = document.getElementById(r.network);
-		label.innerHTML = "<img src='"+ p.thumbnail + "' width=24/>Connected to "+ r.network+" as " + p.name;
+		
 		console.log("HI");
 		loginID = p.id;
-
+		personInfo = p;
+		
 		//__Check if both GOAL and INFO are set; if not redirect to them
 		dpd.users.get({"username":loginID},function(result1){
 			//console.log("i am ",loginID," HI",result1);
@@ -88,12 +106,16 @@ hello.on('auth.login', function(r){
 				console.log("~~ERROR:no such USER exists in db");
 			}
 			
-		});		
+		});
+		
+		
+		
 	});
 });
 </script>
 
 <script>
+
 	dpd.usergoal.get({"userID":loginID,"active":true}, function (result2) {
 		if(!result2)
 		{
@@ -281,10 +303,15 @@ hello.on('auth.login', function(r){
 				}
 				
 				if(daysLeft < 7)
-					message += ",you are close to your goal don't give up!Only "+daysLeft+" days left.";
+					message += "You are close to your goal don't give up!Only "+daysLeft+" days left.";
 								
 				$("#message").text(message);
 				
+				$("#profilePic").attr("src", personInfo.thumbnail);
+				$("#profileName").text(personInfo.name);		
+				
+				$(".loading").hide();
+				$(".pageContent").show();
 				
 				});
 			});

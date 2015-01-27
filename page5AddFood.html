@@ -1,26 +1,30 @@
 <!DOCTYPE html>
-
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+	<link href="./redirect.css" rel="stylesheet" />
+</head>
 <body>
-<script src="lib/hello.js"></script>
-<script src="lib/hello.then.js"></script>
-<script src="lib/modules/windows.js"></script>
-<script src="lib/modules/facebook.js"></script>
-<script src="lib/modules/google.js"></script>
-<script src="lib/moment.js"></script>
+<div class="loading"><span>&bull;</span><span>&bull;</span><span>&bull;</span></div>
+<div id='wrapper' style='display:none'>
+	<p>Hi</p>
+</div>
 
-<script src="http://code.jquery.com/jquery-latest.min.js"></script>
-<script src="./dpd.js"></script>
-
-<button id='google' onclick=" ;">google2</button>&nbsp;
+<div class="pageContent" style="display: none;">
+<h1>Cal-O-Web</h1>
+<img id="profilePic"  width="100" height="100" alt="None"/><br>
+<strong><h3 id="profileName"></h3></strong>
 <button id='logout' onclick="logout('google');">Logout</button><br>
 
-Go to <button id='info' onclick=" goToInfo();">hbe info</button><br>
-Go to <button id='goal' onclick=" goToGoal();">goal</button><br>
-Go to <button id='status' onclick="goToStatus();">status</button><br>
-Go to <button id='sugestion' onclick="goToSugestions();">sugestions</button><br>
-Go to <button id='charts' onclick="goToCharts();">charts</button><br>
+<button id='info' onclick=" goToInfo();">change your data</button>
+<button id='goal' onclick=" goToGoal();">set a new goal</button>
+<button id='status' onclick="goToStatus();">show your status</button>
+<button id='sugestion' onclick="goToSugestions();">sugestions</button>
+<button id='charts' onclick="goToCharts();">charts</button><br>
 <br>
-
+<h4>The <em>current date</em> is displayed and the amount of calories cosumed on that date.</h4>
+<h4>You can add a ingredient and the amount of that ingredient that you consumed in <em>grams</em>.</h4>
+<h4></h4>
 
 Current Date:<input id="date" name="date" />
 Observed Calories for Current Date:<span id="calOnDate"></span><br>
@@ -32,7 +36,16 @@ Consumed Food Quantity in Grams: <input type="number" name="milig" min="1" max="
 &nbsp; which has <span id="foodCalGram"></span> calories / gram.
 <button id='save' onclick=" saveDayCal();">Add</button>
 
+</div>
+<script src="lib/hello.js"></script>
+<script src="lib/hello.then.js"></script>
+<script src="lib/modules/windows.js"></script>
+<script src="lib/modules/facebook.js"></script>
+<script src="lib/modules/google.js"></script>
+<script src="lib/moment.js"></script>
 
+<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script src="./dpd.js"></script>
 <script>
 var loginID;
 var selectedFoodCalories = 0;
@@ -72,8 +85,8 @@ hello.on('auth.login', function(r){
 		//console.log("function input is:"+p.thumbnail);
 		console.log(p);
 		console.log(p.id);
-		var label = document.getElementById(r.network);
-		label.innerHTML = "<img src='"+ p.thumbnail + "' width=24/>Connected to "+ r.network+" as " + p.name;
+		//var label = document.getElementById(r.network);
+		//label.innerHTML = "<img src='"+ p.thumbnail + "' width=24/>Connected to "+ r.network+" as " + p.name;
 		console.log("HI");
 		loginID = p.id;
 
@@ -95,34 +108,18 @@ hello.on('auth.login', function(r){
 				if(!result1[0].hasGoal)
 					window.location.href='./page3SetGoal.html';
 				
-				// check if GOALdate has been reached
-				/*
-				dpd.usergoal.get({"userID":loginID,"active":true}, function (result) {
-					console.log("Querrying USERGOAL for reachedGoal:",result[0].reachedGoal);
-					var currentDate = moment().format('YYYY-MM-DD');
-					if(result[0].dateGoal === currentDate)
-					{
-						dpd.users.put(
-									result1[0].id, 
-									{
-										"hasGoal":false	
-									},
-						function(result, err) {
-							  if(err) 
-								return console.log(err);
-							  console.log("~~~PUT~~~For users~ need new goal:", result);
-							  window.location.href='./page4GoalReached.html';
-						});									
-					}
-				});
-				*/
 			}
 			else
 			{
 				console.log("~~ERROR:no such USER exists in db");
 			}
+			$("#profilePic").attr("src", p.thumbnail);
+			$("#profileName").text(p.name);		
 			
-		});		
+			$(".loading").hide();
+			$(".pageContent").show();	
+		});
+	
 	});
 });
 </script>
@@ -366,3 +363,4 @@ hello.init(
 </script>
 
 </body>
+</html>
