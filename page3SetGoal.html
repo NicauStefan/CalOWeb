@@ -1,28 +1,28 @@
 <!DOCTYPE html>
-
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+	<link href="./redirect.css" rel="stylesheet" />
+</head>
 <body>
-<script src="lib/hello.js"></script>
-<script src="lib/hello.then.js"></script>
-<script src="lib/modules/windows.js"></script>
-<script src="lib/modules/facebook.js"></script>
-<script src="lib/modules/google.js"></script>
-<script src="lib/moment.js"></script>
 
-<!--
-<script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
-<script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
--->
-<script src="http://code.jquery.com/jquery-latest.min.js"></script>
-<script src="./dpd.js"></script>
+<div class="loading"><span>&bull;</span><span>&bull;</span><span>&bull;</span></div>
+<div id='wrapper' style='display:none'>
+	<p>Hi</p>
+</div>
 
-<button id='google' onclick=" ;">google2</button>
+<div class="pageContent" style="display: none;">
+<h1>Cal-O-Web</h1>
+<img id="profilePic"  width="100" height="100" alt="None"/><br>
+<strong><h3 id="profileName"></h3></strong>
 <button id='logout' onclick="logout('google');">Logout</button>
+<h4>On this page you can set yourself a goal to gain(+10 kg),lose(-10 kg) or maitain(0 kg) your current weight.</h4>
+<h4>You can have one goal at any given time and this app requires a goal in order to work.</h4>
 
 <form>
-	<fieldset>
-		<legend>Appearance</legend>
+	
 		<p>
-			<label for="Range">Select Age Range:</label>
+			<label for="Range">Select Weight Range:</label>
 			<select name="Rng" id="Range">
 				<option value="a1">10</option>
 				<option value="a2">20</option>
@@ -33,17 +33,28 @@
 		</p>
 
 		<p>
-			<label for="slider">Select Age:</label> <input name="slider" type="range" min="-10" max="10" id="slider" value="0" />
+			<label for="slider"></label> <input name="slider" type="range" min="-10" max="10" id="slider" value="0" />
 			<!--<span id="output"></span>-->
 		</p>
-		<input type="number" name="kg_w" min="-50" max="50" value="0" id="inpT">
-		<p>Enter the date you want to reach this goal:</p>
-		<p>Format is [Year][Month][Day]</p><br>
+		<span><strong>Weight:</strong></span><input type="number" name="kg_w" min="-50" max="50" value="0" id="inpT" style="width: 30px;"/>
+		<span><strong>Kg</strong></span>
+		<p>Enter the date on which you want to reach this goal:</p>
+		<p>A date should look like :<em>Year-Month-Day</em>, example:<em>2012-12-24</em></p>
 		<input id="date" name="date" />
 		<input type="button" onclick="insertDB();" value="Submit">
-	</fieldset>
+
 </form>
 
+<script src="lib/hello.js"></script>
+<script src="lib/hello.then.js"></script>
+<script src="lib/modules/windows.js"></script>
+<script src="lib/modules/facebook.js"></script>
+<script src="lib/modules/google.js"></script>
+<script src="lib/moment.js"></script>
+
+
+<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script src="./dpd.js"></script>
 <script>
 var currentTime;
 var goalTime;
@@ -315,8 +326,14 @@ hello.on('auth.login', function(r){
 		console.log(p.id);
 		globID = p.id;
 		
-		var label = document.getElementById(r.network);
-		label.innerHTML = "<img src='"+ p.thumbnail + "' width=24/>Connected to "+ r.network+" as " + p.name;
+		//var label = document.getElementById(r.network);
+		//label.innerHTML = "<img src='"+ p.thumbnail + "' width=24/>Connected to "+ r.network+" as " + p.name;
+		
+		$("#profilePic").attr("src", p.thumbnail);
+		$("#profileName").text(p.name);		
+		
+		$(".loading").hide();
+		$(".pageContent").show();
 	});
 	
 	

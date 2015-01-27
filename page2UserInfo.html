@@ -1,10 +1,13 @@
 <!DOCTYPE html>
-
-<body>
+<html>
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
 	<link href="./redirect.css" rel="stylesheet" />
 </head>
+
+
+<body>
+
 
 <div class="loading"><span>&bull;</span><span>&bull;</span><span>&bull;</span></div>
 <div id='wrapper' style='display:none'>
@@ -15,9 +18,10 @@
 <h1>Cal-O-Web</h1>
 <img id="profilePic"  width="100" height="100" alt="None"/><br>
 <strong><h3 id="profileName"></h3></strong>
+<button id='logout' onclick="logout('google');">Logout</button>
 <h4>In order to make your calculations as accurate as possible modify these fields to match your own attributes.</h4>
 <h4>Clicking <em>Submit</em> will overwrite any previous attribute input you might have provided in the past.</h4>
-<button id='logout' onclick="logout('google');">Logout</button>
+<h4>This information is required in order to proceed.</h4>
 
 
 <form id="frm1" action="">
@@ -37,12 +41,12 @@ age in years: <input type="number" name="age_y" min="8" max="110" value="8" styl
 
 </div>
 
+
 <script src="lib/hello.js"></script>
 <script src="lib/hello.then.js"></script>
 <script src="lib/modules/windows.js"></script>
 <script src="lib/modules/facebook.js"></script>
 <script src="lib/modules/google.js"></script>
-
 
 <script src="http://code.jquery.com/jquery-latest.min.js"></script>
 <script src="./dpd.js"></script>
