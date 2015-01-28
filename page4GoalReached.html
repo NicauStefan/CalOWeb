@@ -19,7 +19,7 @@
 <button id='logout' onclick="logout('google');">Logout</button>
 
 <button id='save' onclick=" redirectToNewGoal();">Set goal</button><br>
-<button id='save' onclick=" postUp();">Share Goal Results</button>
+<button id='save1' onclick=" postUp();">Share Goal Results</button>
 
 <h2 id="outputResult"></h2>
 <h2 id="initialW"></h2>
@@ -95,9 +95,24 @@ hello.on('auth.login', function(r){
 
 <script>
 	//Redirect if this date the current date for the goal
+var updateWeightHBE = function(onUser,newVal){
+	
+	dpd.userhbe.put(
+		onUser, 
+		{
+			"weight":newVal	
+		},
+		function(result, err) {
+			if(err) 
+				return console.log("ERROR OCCURED:",err);
+			console.log("done, new weight:",result.weight);
+		});
+							
+};
 	
 var calculateGoal = function(){	
-
+	
+	console.log("loginID",loginID);
 	dpd.usergoal.get({"userID":loginID,"active":true}, function (result2) {	
 		
 		console.log("loginID:",result2);
@@ -108,7 +123,9 @@ var calculateGoal = function(){
 		}
 		if(!result2[0])
 		{//no active goals
+			//console.log("error here");
 			window.location.href='./page3SetGoal.html';
+			
 		}
 		
 		currentTime = moment().format('YYYY-MM-DD');		
@@ -228,16 +245,17 @@ var calculateGoal = function(){
 							{
 								"hasGoal":false	
 							},
-							function(result, err) {
+							function(result3, err) {
 								if(err) 
 									return console.log("ERROR OCCURED:",err);
 								
 								//Give user message in regards to his goal reached or not;
 								//
 								// check here so that his current goal gets deactivated
+								var mes2;
 								if(result1.length == 0)
 								{
-									var mes2 = "You need to provide at least what you consumed in a day.";
+									mes2 = "You need to provide at least what you consumed in a day.";
 									$("#outputResult").text(mes2);
 									$("#profilePic").attr("src", userObj.thumbnail);
 									$("#profileName").text(userObj.name);		
@@ -249,7 +267,7 @@ var calculateGoal = function(){
 								
 								var mes = $("#outputMessage");outputResult
 								var goalResultMesage = "";
-								var mes2;
+								
 								if( goal_weight == deduced_weight )
 								{//succeded
 									goalResultMesage = "You now have " + goal_weight + "kg";
@@ -317,7 +335,7 @@ var calculateGoal = function(){
 								
 								}
 								
-								
+								updateWeightHBE(result[0].id,deduced_weight);
 								
 								$("#initialW").text("Your weight when you set this goal:"+gc_initial+"kg");
 								console.log(goalResultMesage);
