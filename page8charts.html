@@ -204,13 +204,13 @@ var doAllChart = function(){
 						{
 							//am adus in corp mai mult decat necesaru
 							calDelta = result1[i].amount - currentIntake;
-							gc_curent += (calDelta * 0.2958)/1000;//calDelta to grams, then to kg
+							gc_curent += (calDelta * 0.32)/1000;//calDelta to grams, then to kg
 						}
 						else
 						{
 							//am adus in corp mai putin decat necesaru
 							calDelta = currentIntake - result1[i].amount;
-							gc_curent -= (calDelta * 0.2958)/1000;//calDelta to grams, then to kg
+							gc_curent -= (calDelta * 0.32)/1000;//calDelta to grams, then to kg
 						}
 					console.log("For day:",result1[i].date," deduced weight:",gc_curent);
 					chartArray[i] = {"date":result1[i].date , "weight":gc_curent};
