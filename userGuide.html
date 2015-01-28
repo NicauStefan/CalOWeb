@@ -1,10 +1,110 @@
 <!DOCTYPE html>
 <html>
+<head>
+	<link rel="stylesheet" type="text/css" href="styleGuide.css">
+</head>
 <body>
 
+<button id='previous' onclick=" goToPrev();">previous</button>
+<button id='next' onclick=" goToNext();">next</button>
+<img id="a1" src="screenshots/page1.png"></img>
+<img id="a2" src="screenshots/page11.png"></img>
+<img id="a3" src="screenshots/page11.png"></img>
 
-<h1>Cal-O-Web</h1>
+
+<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script>
+var currentPg = 1;
+var changeCurrentPic = function(number){
+	if(number == 1)
+	{
+		console.log(currentPg);
+		$("#a1").attr("src", "screenshots/page1.png");
+		$("#a2").attr("src", "1");
+		$("#a3").attr("src", "1");
+		return;
+	}
+	if(number == 2)
+	{
+		console.log(currentPg);
+		$("#a1").attr("src", "screenshots/pg1a.png");
+		$("#a2").attr("src", "screenshots/pg1aa.png");
+		$("#a3").attr("src", "screenshots/pg1b.png");
+		return;
+	}
+	if(number == 3)
+	{
+		console.log(currentPg);
+		$("#a1").attr("src", "screenshots/pg2.png");
+		$("#a2").attr("src", "1");
+		$("#a3").attr("src", "1");
+		return;
+	}
+	if(number == 4)
+	{
+		console.log(currentPg);
+		$("#a1").attr("src", "screenshots/pg3.png");
+		$("#a2").attr("src", "1");
+		$("#a3").attr("src", "1");
+		return;
+	}
+	if(number == 5)
+	{
+		console.log(currentPg);
+		$("#a1").attr("src", "screenshots/pg4add.png");
+		$("#a2").attr("src", "screenshots/pg4addB.png");
+		$("#a3").attr("src", "1");
+		return;
+	}
+	if(number == 6)
+	{
+		console.log(currentPg);
+		$("#a1").attr("src", "screenshots/pg5status.png");
+		$("#a2").attr("src", "1");
+		$("#a3").attr("src", "1");
+		return;
+	}
+	if(number == 7)
+	{
+		console.log(currentPg);
+		$("#a1").attr("src", "screenshots/pg6sfat.png");
+		$("#a2").attr("src", "1");
+		$("#a3").attr("src", "1");
+		return;
+	}
+	if(number == 8)
+	{
+		console.log(currentPg);
+		$("#a1").attr("src", "screenshots/pg7charts.png");
+		$("#a2").attr("src", "1");
+		$("#a3").attr("src", "1");
+		return;
+	}
+	if(number == 9)
+	{
+		console.log(currentPg);
+		$("#a1").attr("src", "screenshots/pg8good.png");
+		$("#a2").attr("src", "screenshots/pg8bad.png");
+		$("#a3").attr("src", "screenshots/pg8post.png");
+		return;
+	}		
+};
+
+var goToPrev = function(){
+
+	if(currentPg != 1)
+		currentPg -=1;
+	changeCurrentPic(currentPg);
+};
+
+var goToNext = function(){
+
+	if(currentPg != 9)
+		currentPg +=1;
+	changeCurrentPic(currentPg);
+};
 
 
+</script>
 </body>
 </html>

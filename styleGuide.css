@@ -1,0 +1,15 @@
+html
+{
+	background-color: #0000FF;
+	display: flex;
+	text-align: center;
+	flex-flow: column wrap;
+	height: 100%;
+	justify-content: center;
+	margin: 0;
+	/*
+	
+	
+	*/
+
+}
