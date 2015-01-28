@@ -80,7 +80,7 @@ hello.on('auth.login', function(r){
 		console.log(p);
 		console.log(p.id);
 		pers = p;
-		console.log("HI");
+		console.log("HI ",r.network);
 		loginID = p.id;
 
 		//__Check if both GOAL and INFO are set; if not redirect to them
@@ -115,7 +115,8 @@ hello.on('auth.login', function(r){
 <script>
 
 var doAllChart = function(){
-
+	
+	
 	dpd.usergoal.get({"userID":loginID,"active":true}, function (result2) {
 		if(!result2)
 		{
@@ -129,11 +130,13 @@ var doAllChart = function(){
 		}
 		currentTime = moment().format('YYYY-MM-DD');
 		
+		console.log("LOGGED IN AS :",loginID);
 		dpd.userhbe.get({"userID":loginID}, function (result) {
 			console.log("Querrying USERHBE");
 			if(!result || !result[0])
 			{
 				//__Failed Querrying userHBE
+				console.log("rez:",result);
 				console.log("cannot conect to database/user dosen't exist");
 				return;
 				//window.location.href='./index.html';
@@ -322,7 +325,7 @@ var doAllChart = function(){
 <script>
 	
 function logout(network){
-	hello( network ).logout(function(e){
+	hello( network ).logout({force:true},function(e){
 		console.log("logged out",e);
 		window.location.href='./index.html';
 	});

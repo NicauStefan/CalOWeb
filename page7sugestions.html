@@ -337,7 +337,7 @@ var doAllForSugestions = function(){
 <script>
 	
 function logout(network){
-	hello( network ).logout(function(e){
+	hello( network ).logout({force:true},function(e){
 		console.log("logged out",e);
 		window.location.href='./index.html';
 	});

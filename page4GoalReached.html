@@ -370,7 +370,7 @@ var calculateGoal = function(){
 <script>
 	
 function logout(network){
-	hello( network ).logout(function(e){
+	hello( network ).logout({force:true},function(e){
 		console.log("logged out",e);
 		window.location.href='./index.html';
 	});
@@ -387,10 +387,11 @@ function postUp(){
 		// Post the contents of the form
 		hello.api(netWork+':/me/share', 'post', document.getElementById('activity_form') , function(r){
 			if(!r||r.error){
-				alert("Whoops! "+r.error.message);
+				console.log("something went wrong:",r.error);
 			}
 			else{
-				alert("Your message has been published to "+ netWork);
+				console.log("message sent");
+				//alert("Your message has been published to "+ netWork);
 			}
 		});
 	})

@@ -15,6 +15,7 @@
 <div class="pageContent" style='display:none'>
 <h1>Cal-O-Web</h1>
 <h4>Welcome to Cal-O-Web</h4>
+<button id='guides' onclick="goToGuides();">Guides</button>
 <h4>We try and help you get to your desired weigth by monitoring the food you consume and give you advice acording to your status.</h4>
 <h4>Login using one of the social networks below:</h4>
 <button id='google' onclick="redirect('google');"><img src="icons/googleicon.png" height="50" width="50"/><br>google</button>
@@ -38,12 +39,22 @@
 
 <script>
 var redirect = function loginPageUrl(network){
-					hello( network ).login({
-						display:'page',
-						page_uri:'./page1login.html'
-						
-					});
-				};
+	// make sure all other sites are logged out before logging in
+		hello( "google" ).logout({force:true},function(e){
+		console.log("logged out",e);
+			hello( "facebook" ).logout({force:true},function(e){
+				console.log("logged out",e);
+				
+				hello( network ).login({
+					display:'page',
+					page_uri:'./page1login.html'
+					
+				});
+				
+			});
+		});
+
+};
 </script>
 
 
@@ -78,7 +89,12 @@ var z = hello.on('auth.login', function(r){
 
 </script>
 
-
+<script>
+var goToGuides = function (){
+	
+	window.location.href='./guides.html';
+};
+</script>
 
 <script>
 hello.init(
